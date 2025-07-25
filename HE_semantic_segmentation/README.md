@@ -48,7 +48,7 @@ HE_semantic_segmentation/
   - [rendered_thumnails_model7_241113](https://drive.google.com/drive/folders/197165woG291TywZgyKePgV1H16TPVSjE?usp=drive_link)
 
 
-# 仮想環境の再現
+# 📦 仮想環境の再現
 ```
 conda env create -f environment.yml
 conda activate tf
