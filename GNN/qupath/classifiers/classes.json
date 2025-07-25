@@ -1,0 +1,152 @@
+{
+  "pathClasses": [
+    {
+      "name": "Tumor",
+      "color": -3670016
+    },
+    {
+      "name": "Stroma",
+      "color": -6895466
+    },
+    {
+      "name": "Immune cells",
+      "color": -6268256
+    },
+    {
+      "name": "Necrosis",
+      "color": -13487566
+    },
+    {
+      "name": "Other",
+      "color": -14336
+    },
+    {
+      "name": "Region*",
+      "color": -16777036
+    },
+    {
+      "name": "Ignore*",
+      "color": -4934476
+    },
+    {
+      "name": "Positive",
+      "color": -377282
+    },
+    {
+      "name": "Negative",
+      "color": -9408287
+    },
+    {
+      "name": "Fibro(dense,irregular)",
+      "color": -9971177
+    },
+    {
+      "name": "Fibro(dense,regular)",
+      "color": -1245261
+    },
+    {
+      "name": "Fibro(loose)",
+      "color": -8131158
+    },
+    {
+      "name": "RBC",
+      "color": -65281
+    },
+    {
+      "name": "adipose",
+      "color": -8355840
+    },
+    {
+      "name": "lining",
+      "color": -12266779
+    },
+    {
+      "name": "muscle",
+      "color": -5072420
+    },
+    {
+      "name": "plasma",
+      "color": -13577341
+    },
+    {
+      "name": "vessel",
+      "color": -10935798
+    },
+    {
+      "name": "vessel(large)",
+      "color": -619244
+    },
+    {
+      "name": "KMeans: Hetero_Adipose-Fibro(loose)",
+      "color": -5820319
+    },
+    {
+      "name": "KMeans: Hetero_Fibro(dense,irregular)-Adipose-Vessel",
+      "color": -12300343
+    },
+    {
+      "name": "KMeans: Hetero_Fibro(loose)-Adipose",
+      "color": -8674992
+    },
+    {
+      "name": "KMeans: Hetero_Fibro(loose)-Fibro(dense,irregular)",
+      "color": -9643229
+    },
+    {
+      "name": "KMeans: Hetero_Fibro(loose)-Vessel",
+      "color": -13484194
+    },
+    {
+      "name": "KMeans: Hetero_Fibro(loose)-Vessel-Adipose",
+      "color": -8298788
+    },
+    {
+      "name": "KMeans: Hetero_Fibrous-Adipose",
+      "color": -14352532
+    },
+    {
+      "name": "KMeans: Hetero_Fibrous-Vessel",
+      "color": -8743928
+    },
+    {
+      "name": "KMeans: Hetero_Fibrous-Vessel-Adipose",
+      "color": -15181119
+    },
+    {
+      "name": "KMeans: Hetero_Lining-Fibro(loose)",
+      "color": -16023822
+    },
+    {
+      "name": "KMeans: Hetero_Lining-Immune-Fibrous",
+      "color": -3633184
+    },
+    {
+      "name": "KMeans: Hetero_Lining-Vessel-Fibro(loose)",
+      "color": -14329958
+    },
+    {
+      "name": "KMeans: Homo_Adipose",
+      "color": -5904150
+    },
+    {
+      "name": "KMeans: Homo_Fibro(dense,irregular)",
+      "color": -12962635
+    },
+    {
+      "name": "KMeans: Homo_Fibro(dense,regular)",
+      "color": -7413658
+    },
+    {
+      "name": "KMeans: Homo_Fibro(loose)",
+      "color": -9631973
+    },
+    {
+      "name": "KMeans: Mix_Fibrous-Lining-Adipose",
+      "color": -14759531
+    },
+    {
+      "name": "KMeans: Mix_Others",
+      "color": -13410342
+    }
+  ]
+}

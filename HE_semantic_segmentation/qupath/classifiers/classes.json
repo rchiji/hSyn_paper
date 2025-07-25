@@ -1,0 +1,88 @@
+{
+  "pathClasses": [
+    {
+      "name": "Tumor",
+      "color": -3670016
+    },
+    {
+      "name": "Stroma",
+      "color": -6895466
+    },
+    {
+      "name": "Immune cells",
+      "color": -6268256
+    },
+    {
+      "name": "Necrosis",
+      "color": -13487566
+    },
+    {
+      "name": "Other",
+      "color": -14336
+    },
+    {
+      "name": "Region*",
+      "color": -16777036
+    },
+    {
+      "name": "Ignore*",
+      "color": -4934476
+    },
+    {
+      "name": "Positive",
+      "color": -377282
+    },
+    {
+      "name": "Negative",
+      "color": -9408287
+    },
+    {
+      "name": "RBC",
+      "color": -65281
+    },
+    {
+      "name": "Fibro(Perivascular)",
+      "color": -9868802
+    },
+    {
+      "name": "lining",
+      "color": -12266779
+    },
+    {
+      "name": "Fibro(loose)",
+      "color": -8131158
+    },
+    {
+      "name": "Fibro(dense,irregular)",
+      "color": -9971177
+    },
+    {
+      "name": "vessel(large)",
+      "color": -619244
+    },
+    {
+      "name": "vessel",
+      "color": -10935798
+    },
+    {
+      "name": "adipose",
+      "color": -8355840
+    },
+    {
+      "name": "Fibro(dense,regular)",
+      "color": -1245261
+    },
+    {
+      "name": "plasma",
+      "color": -13577341
+    },
+    {
+      "name": "nerve",
+      "color": -582885
+    },
+    {
+      "name": "muscle",
+      "color": -5072420
+    }
+  ]
+}
