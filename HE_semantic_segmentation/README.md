@@ -40,7 +40,7 @@ HE_semantic_segmentation/
   [HEフォルダ](https://drive.google.com/drive/folders/1zCC_lSDlx4vzBxic3E_GgF6Djyitz-ZB?usp=drive_link)
 
 - **訓練データ（パッチ画像・マスク）**  
-  [Train7_241111](https://drive.google.com/drive/folders/18ybfXBofi4t-X2OJG2F0aTgNp9FRiOOZ?usp=drive_link)
+  [Train](https://drive.google.com/drive/folders/18ybfXBofi4t-X2OJG2F0aTgNp9FRiOOZ?usp=drive_link)
 
 - **推論結果データ**  
   - [label_ometiff_model7_241113](https://drive.google.com/drive/folders/19FzmIiERxySgiVUBLJM1ePCDAJIFRlu1?usp=drive_link)  

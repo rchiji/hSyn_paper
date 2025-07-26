@@ -8,7 +8,7 @@ GNN/
 └── qupath/                                          # QuPath用のスクリプトや設定ファイル
 
 ├── data/
-│   ├── labelRatio_241117/                           # SLICタイルごとのラベル比率ファイル（118個） <-- need download
+│   ├── labelRatio/                           # SLICタイルごとのラベル比率ファイル（118個） <-- need download
 │   │   ├── D001_HE.txt
 │   │   ├── ...
 │   │   └── D130_HE.txt
@@ -20,7 +20,7 @@ GNN/
 # 📦 ダウンロードリンク一覧
 
 - **ラベル比率ファイル（SLIC tile単位, 118 files）**  
-  [labelRatio_241117 フォルダ](https://drive.google.com/drive/folders/1G-Y3E7iS7MdGGhgSz1ogzkP2WI6Z1wm0?usp=drive_link)
+  [labelRatio フォルダ](https://drive.google.com/drive/folders/1G-Y3E7iS7MdGGhgSz1ogzkP2WI6Z1wm0?usp=drive_link)
 
 - **訓練済み特徴量（ラベル＋特徴量, HDF5形式）**  
   [GNN_InOut.h5](https://drive.google.com/file/d/1riQMyqboWnH4b2S0tbYj88Ww5YaTtco9/view?usp=drive_link)
