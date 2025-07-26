@@ -1,1 +1,55 @@
-{"providerClassName":"qupath.imagej.images.servers.ImageJServerBuilder","uri":"file:/G:/%E5%85%B1%E6%9C%89%E3%83%89%E3%83%A9%E3%82%A4%E3%83%96/%E6%A4%BF-%E5%8D%83%E3%80%85%E6%9D%BE%20%E5%85%B1%E6%9C%89%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80/hSyn_QuPath/Train_add/D26_HE%20%5Bd\u003d5,x\u003d8907,y\u003d22760,w\u003d1650,h\u003d1972%5D.tif","args":[],"metadata":{"name":"D26_HE [d\u003d5,x\u003d8907,y\u003d22760,w\u003d1650,h\u003d1972].tif","width":330,"height":394,"sizeZ":1,"sizeT":1,"channelType":"DEFAULT","isRGB":true,"pixelType":"UINT8","levels":[{"downsample":1.0,"width":330,"height":394}],"channels":[{"name":"Red","color":-65536},{"name":"Green","color":-16711936},{"name":"Blue","color":-16776961}],"pixelCalibration":{"pixelWidth":{"value":2.2045903981269803,"unit":"µm"},"pixelHeight":{"value":2.2045903981269803,"unit":"µm"},"zSpacing":{"value":1.0,"unit":"µm"},"timeUnit":"SECONDS","timepoints":[]},"preferredTileWidth":330,"preferredTileHeight":394}}
+{
+  "builderType": "uri",
+  "providerClassName": "qupath.imagej.images.servers.ImageJServerBuilder",
+  "uri": "file:/C:/Users/admin/Documents/%E6%9D%B1%E4%BA%AC%E5%A4%A7%E5%AD%A6%20%E6%95%B4%E5%BD%A2%E5%A4%96%E7%A7%91/%E3%83%92%E3%83%88%E6%BB%91%E8%86%9C/hSyn_paper/HE_semantic_segmentation/qupath_train/train_sources/D26_HE%20%5Bd\u003d5,x\u003d8907,y\u003d22760,w\u003d1650,h\u003d1972%5D.tif",
+  "args": [],
+  "metadata": {
+    "name": "D26_HE [d\u003d5,x\u003d8907,y\u003d22760,w\u003d1650,h\u003d1972].tif",
+    "width": 330,
+    "height": 394,
+    "sizeZ": 1,
+    "sizeT": 1,
+    "channelType": "DEFAULT",
+    "isRGB": true,
+    "pixelType": "UINT8",
+    "levels": [
+      {
+        "downsample": 1.0,
+        "width": 330,
+        "height": 394
+      }
+    ],
+    "channels": [
+      {
+        "name": "Red",
+        "color": -65536
+      },
+      {
+        "name": "Green",
+        "color": -16711936
+      },
+      {
+        "name": "Blue",
+        "color": -16776961
+      }
+    ],
+    "pixelCalibration": {
+      "pixelWidth": {
+        "value": 2.2045903981269803,
+        "unit": "µm"
+      },
+      "pixelHeight": {
+        "value": 2.2045903981269803,
+        "unit": "µm"
+      },
+      "zSpacing": {
+        "value": 1.0,
+        "unit": "µm"
+      },
+      "timeUnit": "SECONDS",
+      "timepoints": []
+    },
+    "preferredTileWidth": 330,
+    "preferredTileHeight": 394
+  }
+}

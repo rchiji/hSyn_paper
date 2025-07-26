@@ -1,1 +1,55 @@
-{"builder":{"builderType":"uri","providerClassName":"qupath.imagej.images.servers.ImageJServerBuilder","uri":"file:/C:/Users/admin/Documents/%E6%9D%B1%E4%BA%AC%E5%A4%A7%E5%AD%A6%20%E6%95%B4%E5%BD%A2%E5%A4%96%E7%A7%91/%E3%83%92%E3%83%88%E6%BB%91%E8%86%9C/hSyn_QuPath3/Train_add3/D095_HE%20%5Bd\u003d5,x\u003d10123,y\u003d13092,w\u003d2763,h\u003d2747%5D.tif","args":[],"metadata":{"name":"D095_HE [d\u003d5,x\u003d10123,y\u003d13092,w\u003d2763,h\u003d2747].tif","width":553,"height":549,"sizeZ":1,"sizeT":1,"channelType":"DEFAULT","isRGB":true,"pixelType":"UINT8","levels":[{"downsample":1.0,"width":553,"height":549}],"channels":[{"name":"Red","color":-65536},{"name":"Green","color":-16711936},{"name":"Blue","color":-16776961}],"pixelCalibration":{"pixelWidth":{"value":1.1022684685081898,"unit":"µm"},"pixelHeight":{"value":1.1022684685081898,"unit":"µm"},"zSpacing":{"value":1.0,"unit":"µm"},"timeUnit":"SECONDS","timepoints":[]},"preferredTileWidth":553,"preferredTileHeight":549}},"metadata":{"name":"D095_HE [d\u003d5,x\u003d10123,y\u003d13092,w\u003d2763,h\u003d2747].tif","width":553,"height":549,"sizeZ":1,"sizeT":1,"channelType":"DEFAULT","isRGB":true,"pixelType":"UINT8","levels":[{"downsample":1.0,"width":553,"height":549}],"channels":[{"name":"Red","color":-65536},{"name":"Green","color":-16711936},{"name":"Blue","color":-16776961}],"pixelCalibration":{"pixelWidth":{"value":1.1022684685081898,"unit":"µm"},"pixelHeight":{"value":1.1022684685081898,"unit":"µm"},"zSpacing":{"value":1.0,"unit":"µm"},"timeUnit":"SECONDS","timepoints":[]},"preferredTileWidth":553,"preferredTileHeight":549}}
+{
+  "builderType": "uri",
+  "providerClassName": "qupath.imagej.images.servers.ImageJServerBuilder",
+  "uri": "file:/C:/Users/admin/Documents/%E6%9D%B1%E4%BA%AC%E5%A4%A7%E5%AD%A6%20%E6%95%B4%E5%BD%A2%E5%A4%96%E7%A7%91/%E3%83%92%E3%83%88%E6%BB%91%E8%86%9C/hSyn_paper/HE_semantic_segmentation/qupath_train/train_sources/D095_HE%20%5Bd\u003d5,x\u003d10123,y\u003d13092,w\u003d2763,h\u003d2747%5D.tif",
+  "args": [],
+  "metadata": {
+    "name": "D095_HE [d\u003d5,x\u003d10123,y\u003d13092,w\u003d2763,h\u003d2747].tif",
+    "width": 553,
+    "height": 549,
+    "sizeZ": 1,
+    "sizeT": 1,
+    "channelType": "DEFAULT",
+    "isRGB": true,
+    "pixelType": "UINT8",
+    "levels": [
+      {
+        "downsample": 1.0,
+        "width": 553,
+        "height": 549
+      }
+    ],
+    "channels": [
+      {
+        "name": "Red",
+        "color": -65536
+      },
+      {
+        "name": "Green",
+        "color": -16711936
+      },
+      {
+        "name": "Blue",
+        "color": -16776961
+      }
+    ],
+    "pixelCalibration": {
+      "pixelWidth": {
+        "value": 1.1022684685081898,
+        "unit": "µm"
+      },
+      "pixelHeight": {
+        "value": 1.1022684685081898,
+        "unit": "µm"
+      },
+      "zSpacing": {
+        "value": 1.0,
+        "unit": "µm"
+      },
+      "timeUnit": "SECONDS",
+      "timepoints": []
+    },
+    "preferredTileWidth": 553,
+    "preferredTileHeight": 549
+  }
+}
