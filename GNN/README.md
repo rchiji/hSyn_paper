@@ -5,8 +5,8 @@ GNN/
 ├── README.md                                        # 本ファイル
 ├── model_weights/                                   # 学習済みモデル
 │   └── CancerCell_model_20um_5hop3sample64feat_241118.pt
-└── qupath/                                          # QuPath用のスクリプトや設定ファイル
-
+└── qupath/                                          # WSI予測ラベル画像を扱うためのQuPathプロジェクト
+|
 ├── data/
 │   ├── labelRatio/                           # SLICタイルごとのラベル比率ファイル（118個） <-- need download
 │   │   ├── D001_HE.txt
