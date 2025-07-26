@@ -8,7 +8,7 @@ HE_semantic_segmentation/
 ├── qupath/                                 # QuPath用のスクリプトや設定ファイル
 ├── qupath_train/                           # 正解ラベル付け作業のQuPathプロジェクト
 │   ├── train_sources/                      # 正解ラベル付けの元画像
-│   └──Train7_trainObjects_241111/         # 正解ラベルのgeojson
+│   └── Train7_trainObjects_241111/         # 正解ラベルのgeojson
 
 ├── data/
 │   ├── HE/                             # HEスライド画像（NDPI)
