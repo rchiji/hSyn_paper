@@ -5,7 +5,9 @@ HE_semantic_segmentation/
 ├── README.md                               # 説明ドキュメント
 ├── model_weights/                          # 学習済みモデルの重みファイル
 │   └── model7_241111.h5                    # <-- need download
-├── qupath/                                 # QuPath用のスクリプトや設定ファイル
+|
+├── qupath/                                 # オリジナルのHE画像操作用QuPathプロジェクト
+|
 ├── qupath_train/                           # 正解ラベル付け作業のQuPathプロジェクト
 │   ├── train_sources/                      # 正解ラベル付けの元画像
 │   └── Train7_trainObjects_241111/         # 正解ラベルのgeojson
