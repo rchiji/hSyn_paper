@@ -1,0 +1,1 @@
+{"timestamp":1687482745820,"imageType":"BRIGHTFIELD_H_E","server":{"width":1000,"height":1000,"sizeC":3,"sizeZ":1,"sizeT":1},"hierarchy":{"nObjects":73,"objectTypeCounts":{"Root objects":1,"Annotations":72},"annotationClassificationCounts":{"Fibro(Perivascular)":4,"RBC":26,"Ignore*":3,"lining":4,"vessel":20,"Fibro(loose)":4,"adipose":11},"detectionClassificationCounts":{}}}

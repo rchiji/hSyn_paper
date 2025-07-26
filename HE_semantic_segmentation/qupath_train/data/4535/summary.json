@@ -1,0 +1,1 @@
+{"timestamp":1687482777409,"imageType":"BRIGHTFIELD_H_E","server":{"width":893,"height":938,"sizeC":3,"sizeZ":1,"sizeT":1},"hierarchy":{"nObjects":16,"objectTypeCounts":{"Root objects":1,"Annotations":15},"annotationClassificationCounts":{"RBC":1,"vessel":4,"adipose":9,"Fibro(dense,irregular)":1},"detectionClassificationCounts":{}}}

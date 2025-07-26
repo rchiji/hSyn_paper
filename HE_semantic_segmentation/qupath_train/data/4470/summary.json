@@ -1,0 +1,1 @@
+{"timestamp":1731306646781,"imageType":"BRIGHTFIELD_H_E","server":{"width":650,"height":627,"sizeC":3,"sizeZ":1,"sizeT":1},"hierarchy":{"nObjects":22,"objectTypeCounts":{"Root objects":1,"Annotations":21},"annotationClassificationCounts":{"RBC":3,"vessel":10,"Fibro(loose)":1,"Fibro(dense,regular)":4,"Immune cells":1,"plasma":2},"detectionClassificationCounts":{}}}
