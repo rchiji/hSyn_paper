@@ -6,6 +6,7 @@ GNN/
 ├── model_weights/                                   # 学習済みモデル
 │   └── CancerCell_model_20um_5hop3sample64feat_241118.pt
 └── qupath/                                          # WSI予測ラベル画像を扱うためのQuPathプロジェクト
+|                                                    # label_ometiff_model7_241113をimportしたもの                    
 |
 ├── data/
 │   ├── labelRatio/                           # SLICタイルごとのラベル比率ファイル（118個） <-- need download
@@ -18,6 +19,9 @@ GNN/
 ```
 
 # 📦 ダウンロードリンク一覧
+
+- **推論結果データ**  
+  - [label_ometiff_model7_241113](https://drive.google.com/drive/folders/19FzmIiERxySgiVUBLJM1ePCDAJIFRlu1?usp=drive_link)  
 
 - **ラベル比率ファイル（SLIC tile単位, 118 files）**  
   [labelRatio フォルダ](https://drive.google.com/drive/folders/1G-Y3E7iS7MdGGhgSz1ogzkP2WI6Z1wm0?usp=drive_link)
