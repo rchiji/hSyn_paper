@@ -1,0 +1,20 @@
+Github desktop
+
+1. Go to the hSYN_paper page and click the "Code" button.
+
+2. Click “Open with GitHub Desktop.”
+   If this option is not available, it will redirect you to the installation page.
+   Install GitHub Desktop following the instructions.
+
+3. Launch GitHub Desktop.
+
+4. To sync changes from the remote repository to your local repository, click “Fetch origin.”
+
+5. Make your edits or other changes locally.
+
+6. If there are changes in your local files, GitHub Desktop will detect them automatically.
+   empty folders may not be recognized.
+
+7. The changed files will appear on the left panel. Enter a suitable description and click “Commit.”
+
+8. Click the “Push origin” button to upload your local changes to the remote repository.
