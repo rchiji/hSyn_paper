@@ -3,6 +3,8 @@
 HE_semantic_segmentation/
 ├── environment.yml                         # conda仮想環境ファイル
 ├── README.md                               # 説明ドキュメント
+├── custom_scripts/                         # 推論時（訓練済みモデルを使ってQuPathから予測するときに使用していた）
+├── Custom_semantic_keras/                  # 訓練時に使用したカスタムスクリプト
 ├── model_weights/                          # 学習済みモデルの重みファイル
 │   └── model7_241111.h5                    # <-- need download
 |
