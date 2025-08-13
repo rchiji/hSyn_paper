@@ -65,6 +65,7 @@ conda activate tf
 Custom_semantic_kerasフォルダのスクリプトを使用。詳しくは「241111_Train7モデルの訓練.ipynb」を参照。
 
 # 推論
-QuPath内からPythonスクリプトを実行して予測を実行。qupath/scripts/241111_QuPath内でSemantic_全領域版_model7.groovy を参照。  
-再度実行する場合は、groovyファイル内のパスを要変更。
+QuPath内からPythonスクリプトを実行して予測を実行。「qupath/scripts/241111_QuPath内でSemantic_全領域版_model7.groovy」 を参照。  
+再度実行する場合は、groovyファイル内のパスを要変更。  
+「qupath/scripts/custom_scripts/」がQuPath内で使用するPythonパッケージ。
 
