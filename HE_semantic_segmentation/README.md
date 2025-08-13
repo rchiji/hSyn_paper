@@ -3,7 +3,6 @@
 HE_semantic_segmentation/
 ├── environment.yml                         # conda仮想環境ファイル
 ├── README.md                               # 説明ドキュメント
-├── custom_scripts/                         # 推論時（訓練済みモデルを使ってQuPathから予測するときに使用していた）
 ├── Custom_semantic_keras/                  # 訓練時に使用したカスタムスクリプト
 ├── model_weights/                          # 学習済みモデルの重みファイル
 │   └── model7_241111.h5                    # <-- need download
@@ -60,3 +59,12 @@ HE_semantic_segmentation/
 conda env create -f environment.yml
 conda activate tf
 ```
+
+
+# 訓練
+Custom_semantic_kerasフォルダのスクリプトを使用。詳しくは「241111_Train7モデルの訓練.ipynb」を参照。
+
+# 推論
+QuPath内からPythonスクリプトを実行して予測を実行。qupath/scripts/241111_QuPath内でSemantic_全領域版_model7.groovy を参照。  
+再度実行する場合は、groovyファイル内のパスを要変更。
+
