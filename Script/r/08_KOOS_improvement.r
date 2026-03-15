@@ -2,7 +2,7 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 
-df <- read.delim(file = "00_src/annotations_full.txt", sep = "\t", row.names = 1)   
+df <- read.delim(file = "01_formatted/annotations_full_tissue_proportion_cluster.txt", sep = "\t", row.names = 1)   
 df_OA <- df[df$Diagnosis == "OA",]
 
 
@@ -12,9 +12,13 @@ df_symptom <- df_OA[,c(19,24,29)]
 df_pain <- na.omit(df_pain)
 df_symptom <- na.omit(df_symptom)
 
-df_pain <- df_pain %>% 
+cluster <- df_OA$cluster
+names(cluster) <- rownames(df_OA)
+
+
+df_pain <- df_pain %>%
   mutate(ImprovementValue = Post_12Month__KOOS_Pain - Pre__KOOS_Pain,
-         Improvement = ifelse(ImprovementValue < 10, "< 10", ">= 10"))
+         Improvement_strict = ifelse(ImprovementValue < 10, "< 10", ">= 10"))
 
 df_pain_long <- df_pain %>%
   rownames_to_column("Donor") %>%
@@ -22,9 +26,9 @@ df_pain_long <- df_pain %>%
                names_to = "KOOS", values_to = "Value")
 
 df_pain_long$KOOS <- factor(df_pain_long$KOOS, 
-                               levels = c("Pre__KOOS_Pain", "Post_3Month__KOOS_Pain", "Post_12Month__KOOS_Pain"))
+                            levels = c("Pre__KOOS_Pain", "Post_3Month__KOOS_Pain", "Post_12Month__KOOS_Pain"))
 
-p <- ggplot(df_pain_long, aes(x = KOOS, y = Value, group = Donor, color = Improvement)) +
+p <- ggplot(df_pain_long, aes(x = KOOS, y = Value, group = Donor, color = Improvement_strict)) +
   geom_line(linewidth = 0.1) +
   geom_point(size = 0.4, shape = 1) +
   labs(y = "KOOS Pain") +
@@ -44,17 +48,50 @@ p <- ggplot(df_pain_long, aes(x = KOOS, y = Value, group = Donor, color = Improv
         legend.box.margin = margin(0, 0, 0, 0),
         legend.margin     = margin(0, 0, 0, 0))
 
-ggsave("99_Fig/fig3/KOOS_pain_improvement_3point.png", plot = p, width = 2, height = 2.5)
-ggsave("99_Fig/fig3/KOOS_pain_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig3/KOOS_pain_improvement_3point.png", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig3/KOOS_pain_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
 
+df_pain <- df_pain %>%
+  mutate(Improvement = ifelse(ImprovementValue < 10, "Remained stable", "Improved"))
 
-df_symptom <- df_symptom %>%
-  mutate(ImprovementRate = (Post_12Month__KOOS_Symptom - Pre__KOOS_Symptom) / Pre__KOOS_Symptom,
-         Improvement = ifelse(ImprovementRate < 0.25, "< 0.25", ">= 0.25"))
+df_pain$cluster <- cluster[rownames(df_pain)]
+df_stacked_bar <- df_pain
+df_stacked_bar <- df_stacked_bar %>% 
+  count(Improvement, cluster)
+
+df_stacked_bar$cluster <- factor(df_stacked_bar$cluster, levels = c("1", "2", "3","4"))
+
+plot_stacked_bar <- ggplot(df_stacked_bar, aes(x = Improvement, y = n, fill = cluster)) +
+  geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.9) +
+  labs(y = "Fraction of cluster", fill = "cluster") +
+  scale_y_continuous(labels = function(x) x * 100) +
+  scale_fill_manual(values = c("1" = "#C2BAB4", "2" = "#FEC089", "3" = "#F06A00", "4" = "#8C2D04")) +
+  theme_classic() +
+  theme(
+    plot.title = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.x = element_line(linewidth = 0.1),
+    axis.ticks.y = element_line(linewidth = 0.1),
+    axis.line = element_line(linewidth = 0.1),
+    axis.title.x = element_blank(),
+    axis.text.x  = element_text(size = 5),
+    axis.title.y = element_text(size = 6, margin = margin(r = 0, unit = "mm") ),
+    axis.text.y  = element_text(size = 5),
+    legend.title = element_text(size = 5, margin = margin(b = 2)),
+    legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
+    legend.key.size = unit(2, "mm"),
+    legend.margin = margin(t = -1, b = -1, unit = "mm"),
+    legend.box.margin = margin(0, 0, 0, -3, unit = "mm"),
+    plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
+  )
+
+ggsave("99_Fig/fig3/KOOS_pain_improvement_cluster_proportion.png", plot = plot_stacked_bar, width = 1, height = 1.25)
+ggsave("99_Fig/fig3/KOOS_pain_improvement_cluster_proportion.pdf", plot = plot_stacked_bar, width = 1, height = 1.25)
+
 
 df_symptom <- df_symptom %>% 
-    mutate(ImprovementValue = Post_12Month__KOOS_Symptom - Pre__KOOS_Symptom,
-           Improvement = ifelse(ImprovementValue < 10, "< 10", ">= 10"))
+  mutate(ImprovementValue = Post_12Month__KOOS_Symptom - Pre__KOOS_Symptom,
+         Improvement_strict = ifelse(ImprovementValue < 10, "< 10", ">= 10"))
 
 df_symptom_long <- df_symptom %>%
   rownames_to_column("Donor") %>%
@@ -64,7 +101,7 @@ df_symptom_long <- df_symptom %>%
 df_symptom_long$KOOS <- factor(df_symptom_long$KOOS, 
                                levels = c("Pre__KOOS_Symptom", "Post_3Month__KOOS_Symptom", "Post_12Month__KOOS_Symptom"))
 
-p <- ggplot(df_symptom_long, aes(x = KOOS, y = Value, group = Donor, color = Improvement)) +
+p <- ggplot(df_symptom_long, aes(x = KOOS, y = Value, group = Donor, color = Improvement_strict)) +
   geom_line(linewidth = 0.1) +
   geom_point(size = 0.4, shape = 1) +
   labs(y = "KOOS Symptom") +
@@ -84,30 +121,44 @@ p <- ggplot(df_symptom_long, aes(x = KOOS, y = Value, group = Donor, color = Imp
         legend.box.margin = margin(0, 0, 0, 0),
         legend.margin     = margin(0, 0, 0, 0))
 
-ggsave("99_Fig/fig3/KOOS_symptom_improvement_3point.png", plot = p, width = 2, height = 2.5)
-ggsave("99_Fig/fig3/KOOS_symptom_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig3/KOOS_symptom_improvement_3point.png", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig3/KOOS_symptom_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
 
+df_symptom <- df_symptom %>% 
+  mutate(Improvement = ifelse(ImprovementValue < 10, "Remained stable", "Improved"))
 
-sessionInfo()
-# R version 4.3.3 (2024-02-29 ucrt)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 11 x64 (build 26200)
-# 
-# Matrix products: default
-# 
-# 
-# locale:
-#  [1] LC_COLLATE=Japanese_Japan.utf8  LC_CTYPE=Japanese_Japan.utf8    LC_MONETARY=Japanese_Japan.utf8 LC_NUMERIC=C                    LC_TIME=Japanese_Japan.utf8    
-# 
-# time zone: Asia/Tokyo
-# tzcode source: internal
-# 
-# attached base packages:
-#  [1] stats     graphics  grDevices utils     datasets  methods   base     
-# 
-# other attached packages:
-#  [1] lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1   purrr_1.0.4     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.1   tidyverse_2.0.0 dplyr_1.1.4    
-# 
-# loaded via a namespace (and not attached):
-#  [1] gtable_0.3.6      compiler_4.3.3    tidyselect_1.2.1  systemfonts_1.2.1 scales_1.3.0      textshaping_1.0.0 R6_2.6.1          labeling_0.4.3    generics_0.1.3    munsell_0.5.1     pillar_1.10.1     tzdb_0.5.0        rlang_1.1.5       stringi_1.8.7     timechange_0.3.0 
-# [16] cli_3.6.4         withr_3.0.2       magrittr_2.0.3    grid_4.3.3        rstudioapi_0.17.1 hms_1.1.3         lifecycle_1.0.4   vctrs_0.6.5       glue_1.8.0        farver_2.1.2      ragg_1.3.3        colorspace_2.1-1  tools_4.3.3       pkgconfig_2.0.3
+df_symptom$cluster <- cluster[rownames(df_symptom)]
+df_stacked_bar <- df_symptom
+
+df_stacked_bar <- df_stacked_bar %>% 
+  count(Improvement, cluster)
+
+df_stacked_bar$cluster <- factor(df_stacked_bar$cluster, levels = c("1", "2", "3","4"))
+
+plot_stacked_bar <- ggplot(df_stacked_bar, aes(x = Improvement, y = n, fill = cluster)) +
+  geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.9) +
+  labs(y = "Fraction of cluster", fill = "cluster") +
+  scale_y_continuous(labels = function(x) x * 100) +
+  scale_fill_manual(values = c("1" = "#C2BAB4", "2" = "#FEC089", "3" = "#F06A00", "4" = "#8C2D04")) +
+  theme_classic() +
+  theme(
+    plot.title = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.x = element_line(linewidth = 0.1),
+    axis.ticks.y = element_line(linewidth = 0.1),
+    axis.line = element_line(linewidth = 0.1),
+    axis.title.x = element_blank(),
+    axis.text.x  = element_text(size = 5),
+    axis.title.y = element_text(size = 6, margin = margin(r = 0, unit = "mm") ),
+    axis.text.y  = element_text(size = 5),
+    legend.title = element_text(size = 5, margin = margin(b = 2)),
+    legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
+    legend.key.size = unit(2, "mm"),
+    legend.margin = margin(t = -1, b = -1, unit = "mm"),
+    legend.box.margin = margin(0, 0, 0, -3, unit = "mm"),
+    plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
+  )
+
+ggsave("99_Fig/fig3/KOOS_symptom_improvement_cluster_proportion.png", plot = plot_stacked_bar, width = 1, height = 1.25)
+ggsave("99_Fig/fig3/KOOS_symptom_improvement_cluster_proportion.pdf", plot = plot_stacked_bar, width = 1, height = 1.25)
+

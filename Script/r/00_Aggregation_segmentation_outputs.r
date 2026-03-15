@@ -4,7 +4,7 @@ library(ggplot2)
 library(pheatmap)
 library(patchwork)
 
-file_paths <- list.files(path = "00_src/Annotation_ratio_v2/", full.names = TRUE)
+file_paths <- list.files(path = "00_src/Annotation_ratio/", full.names = TRUE)
 samplenames <- sapply(file_paths, function(x) {
   x <- basename(x)
   gsub(pattern = "_HE.*",replacement = "",x)
@@ -42,18 +42,6 @@ res <- do.call(rbind, lapply(summary_list,function(x){
   return(value)
 }))
 
-write.table(res, "annotations_for_analysis.txt", sep = "\t", quote = FALSE, col.names = NA)
+write.table(res, "00_src/annotations_for_analysis.txt", sep = "\t", quote = FALSE, col.names = NA)
 # -> Clinical information was manually added, and the file was saved as "annotations_full.txt".
-
-
-# # Measurement of microvessel area (for determining the filtering threshold for large vessels)
-# file_list_vessel <- lapply(file_list, function(x) {
-#   filter(x, Classification == "vessel")
-# })
-# 
-# file_list_vessel_all <- bind_rows(file_list_vessel)
-# 
-# summary(file_list_vessel_all$Area.µm.2)
-# #     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-# #    10.93    98.41   292.81   679.43   744.79 41865.11 
 

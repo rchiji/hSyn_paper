@@ -76,27 +76,3 @@ plot_tissue  <- pheatmap(mat,
 )
 dev.off()
 
-
-sessionInfo()
-# R version 4.3.3 (2024-02-29 ucrt)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 11 x64 (build 26200)
-# 
-# Matrix products: default
-# 
-# 
-# locale:
-#  [1] LC_COLLATE=Japanese_Japan.utf8  LC_CTYPE=Japanese_Japan.utf8    LC_MONETARY=Japanese_Japan.utf8 LC_NUMERIC=C                    LC_TIME=Japanese_Japan.utf8    
-# 
-# time zone: Asia/Tokyo
-# tzcode source: internal
-# 
-# attached base packages:
-#  [1] stats     graphics  grDevices utils     datasets  methods   base     
-# 
-# other attached packages:
-#  [1] pheatmap_1.0.12    psych_2.5.3        compositions_2.0-8
-# 
-# loaded via a namespace (and not attached):
-#  [1] tensorA_0.36.2.1    R6_2.6.1            bayesm_3.1-6        RColorBrewer_1.1-3  DEoptimR_1.1-3-1    lattice_0.22-5      gtable_0.3.6        glue_1.8.0          parallel_4.3.3      lifecycle_1.0.4     cli_3.6.4           scales_1.3.0        grid_4.3.3         
-# [14] robustbase_0.99-4-1 mnormt_2.1.1        compiler_4.3.3      rstudioapi_0.17.1   tools_4.3.3         nlme_3.1-164        munsell_0.5.1       colorspace_2.1-1    Rcpp_1.0.14         rlang_1.1.5         MASS_7.3-60.0.1

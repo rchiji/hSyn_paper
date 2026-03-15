@@ -447,29 +447,3 @@ auc_val <- auc(roc_oob)
 text(0.65, 0.05, labels = lab_txt, cex = 0.5, col = "red", font = 1)
 dev.off()
 
-
-sessionInfo()
-# R version 4.3.3 (2024-02-29 ucrt)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 11 x64 (build 26200)
-# 
-# Matrix products: default
-# 
-# 
-# locale:
-#  [1] LC_COLLATE=Japanese_Japan.utf8  LC_CTYPE=Japanese_Japan.utf8    LC_MONETARY=Japanese_Japan.utf8 LC_NUMERIC=C                    LC_TIME=Japanese_Japan.utf8    
-# 
-# time zone: Asia/Tokyo
-# tzcode source: internal
-# 
-# attached base packages:
-#  [1] stats     graphics  grDevices utils     datasets  methods   base     
-# 
-# other attached packages:
-#  [1] pROC_1.18.5           randomForest_4.7-1.2  pheatmap_1.0.12       randomForestSRC_3.3.3
-# 
-# loaded via a namespace (and not attached):
-#  [1] cli_3.6.4          data.tree_1.1.0    rlang_1.1.5        stringi_1.8.7      jsonlite_2.0.0     glue_1.8.0         colorspace_2.1-1   plyr_1.8.9         htmltools_0.5.8.1  scales_1.3.0       grid_4.3.3         munsell_0.5.1      visNetwork_2.1.2   fastmap_1.2.0     
-# [15] lifecycle_1.0.4    DiagrammeR_1.0.11  compiler_4.3.3     RColorBrewer_1.1-3 Rcpp_1.0.14        htmlwidgets_1.6.4  rstudioapi_0.17.1  digest_0.6.37      R6_2.6.1           parallel_4.3.3     magrittr_2.0.3     tools_4.3.3        gtable_0.3.6      
-
-

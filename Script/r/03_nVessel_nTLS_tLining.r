@@ -101,7 +101,7 @@ df_tissue <- column_to_rownames(df_tissue, var = "SampleName")
 
 
 # Tissue Area
-file_paths <- list.files(path = "00_src/Annotation_ratio_v2/", full.names = TRUE)
+file_paths <- list.files(path = "00_src/Annotation_ratio/", full.names = TRUE)
 file_list <- lapply(file_paths, read.delim)
 
 samplenames <- sapply(file_paths, function(x) {
@@ -139,18 +139,18 @@ df_tissue <- df_tissue %>%
 df[,37:44] <- df_tissue[,c(1:4,6:8,5)]
 # write.table(df, "01_formatted/annotations_full_tissue_count_thickness.txt", sep = "\t", row.names = TRUE, col.names = NA)
 
-df_OA_nonOA_RA <- df[df$Diagnosis != "SLE",]
+df_OA_nonOA_RA <- df[!df$Diagnosis %in% c("SLE", "SSc"), ]
 df_OA_nonOA_RA <- df_OA_nonOA_RA[df_OA_nonOA_RA$Joint == "Knee",]
 
-component <- colnames(df_OA_nonOA_RA[,37:44])
+component <- colnames(df_OA_nonOA_RA[,37:43])
 
 
 # statistics
 ## shapiro_test
 shapiro_test_results <- df_OA_nonOA_RA %>% summarise(across(37:43, ~ shapiro.test(.)$p.value))
 shapiro_test_results 
-#   Micro_vessel_number Large_vessel_number  TLS_number Lining_thickness Micro_vessel_ratio Large_vessel_ratio    TLS_ratio
-# 1          3.6835e-12        8.742707e-13 1.19011e-20      0.006392078        0.009115167        2.14505e-12 2.181534e-20
+# Micro_vessel_number Large_vessel_number   TLS_number Lining_thickness Micro_vessel_ratio Large_vessel_ratio    TLS_ratio
+# 1         3.37017e-12        1.339206e-12 1.521199e-20       0.00695195         0.01054021       1.603972e-12 2.790525e-20
 
 ## kruskal.test
 results <- list()
@@ -171,7 +171,6 @@ for (comp in component) {
   )
 }
 
-cat("\n========== Kruskal-Wallis Results ==========\n")
 for (comp in component) {
   cat("\n--- Results for", comp, "---\n")
   print(results[[comp]]$main_test)
@@ -188,60 +187,35 @@ for (comp in component) {
   }
 }
 
-# --- Results for Micro_vessel_number ---
-# data:  Micro_vessel_number by Diagnosis
-# Kruskal-Wallis chi-squared = 29.292, df = 2, p-value = 4.358e-07
+# Notes: Significant differences are shown.
 # ** Significant Dunn Post-hoc Test Results for Micro_vessel_number **
-#   =============================================
-#   >> Comparison: nonOA - OA - Adjusted P-value: 0.00000 - Z-value: -5.34741
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.00014 - Z-value: -3.73326
 # =============================================
-#   
-# --- Results for Large_vessel_number ---
-# data:  Large_vessel_number by Diagnosis
-# Kruskal-Wallis chi-squared = 7.6526, df = 2, p-value = 0.02179
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.00000 - Z-value: -5.32507
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.00014 - Z-value: -3.74517
+# =============================================
 # ** Significant Dunn Post-hoc Test Results for Large_vessel_number **
 # =============================================
-#   >> Comparison: nonOA - OA - Adjusted P-value: 0.00871 - Z-value: -2.75859
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.06115 - Z-value: -1.74187
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.01021 - Z-value: -2.70601
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.05905 - Z-value: -1.75807
 # =============================================
-#   
-# --- Results for TLS_number ---
-# data:  TLS_number by Diagnosis
-# Kruskal-Wallis chi-squared = 17.772, df = 2, p-value = 0.0001383
 # ** Significant Dunn Post-hoc Test Results for TLS_number **
 # =============================================
-#   >> Comparison: nonOA - OA - Adjusted P-value: 0.00033 - Z-value: -3.51518
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.00014 - Z-value: -3.91540
-# >> Comparison: OA - RA    - Adjusted P-value: 0.03620 - Z-value: -1.79662
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.00029 - Z-value: -3.54653
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.00014 - Z-value: -3.90987
+# >> Comparison: OA - RA    - Adjusted P-value: 0.03925 - Z-value: -1.75942
 # =============================================
-#   
-# --- Results for Lining_thickness ---
-# data:  Lining_thickness by Diagnosis
-# Kruskal-Wallis chi-squared = 21.438, df = 2, p-value = 2.212e-05
 # ** Significant Dunn Post-hoc Test Results for Lining_thickness **
 # =============================================
-#   >> Comparison: nonOA - OA - Adjusted P-value: 0.00045 - Z-value: -3.43160
-# >> Comparison: OA - RA    - Adjusted P-value: 0.00053 - Z-value: 3.57025
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.00051 - Z-value: -3.39952
+# >> Comparison: OA - RA    - Adjusted P-value: 0.00059 - Z-value: 3.54483
 # =============================================
-#   
-# --- Results for Micro_vessel_ratio ---
-# data:  Micro_vessel_ratio by Diagnosis
-# Kruskal-Wallis chi-squared = 0.54213, df = 2, p-value = 0.7626
-# 
-# --- Results for Large_vessel_ratio ---
-# data:  Large_vessel_ratio by Diagnosis
-# Kruskal-Wallis chi-squared = 0.2435, df = 2, p-value = 0.8854
-# 
-# --- Results for TLS_ratio ---
-# data:  TLS_ratio by Diagnosis
-# Kruskal-Wallis chi-squared = 17.49, df = 2, p-value = 0.0001593
 # ** Significant Dunn Post-hoc Test Results for TLS_ratio **
 # =============================================
-# >> Comparison: nonOA - OA - Adjusted P-value: 0.00032 - Z-value: -3.52286
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.00017 - Z-value: -3.85943
-# >> Comparison: OA - RA    - Adjusted P-value: 0.04246 - Z-value: -1.72284
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.00028 - Z-value: -3.55432
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.00017 - Z-value: -3.85346
+# >> Comparison: OA - RA    - Adjusted P-value: 0.04599 - Z-value: -1.68508
 # =============================================
+
 
 # Plot
 custom_labels_num <- c(
@@ -407,29 +381,4 @@ p5 <- ggplot(df_long_ratio_vessel, aes(x = Diagnosis, y = Value, color = Diagnos
     legend.margin     = margin(0, 0, 0, 0))
 ggsave("99_Fig/fig2/nonOA_OA_RA_vessel_ratio.png", plot = p5, width = 3, height = 1.25)
 ggsave("99_Fig/fig2/nonOA_OA_RA_vessel_ratio.pdf", plot = p5, width = 3, height = 1.25)
-
-
-sessionInfo()
-# R version 4.3.3 (2024-02-29 ucrt)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 11 x64 (build 26200)
-# 
-# Matrix products: default
-# 
-# 
-# locale:
-#  [1] LC_COLLATE=Japanese_Japan.utf8  LC_CTYPE=Japanese_Japan.utf8    LC_MONETARY=Japanese_Japan.utf8 LC_NUMERIC=C                    LC_TIME=Japanese_Japan.utf8    
-# 
-# time zone: Asia/Tokyo
-# tzcode source: internal
-# 
-# attached base packages:
-#  [1] stats     graphics  grDevices utils     datasets  methods   base     
-# 
-# other attached packages:
-#  [1] dunn.test_1.3.6 lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1   purrr_1.0.4     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.1   tidyverse_2.0.0 dplyr_1.1.4    
-# 
-# loaded via a namespace (and not attached):
-#  [1] gtable_0.3.6      compiler_4.3.3    tidyselect_1.2.1  systemfonts_1.2.1 scales_1.3.0      textshaping_1.0.0 R6_2.6.1          labeling_0.4.3    generics_0.1.3    munsell_0.5.1     pillar_1.10.1     tzdb_0.5.0        rlang_1.1.5       stringi_1.8.7     timechange_0.3.0 
-# [16] cli_3.6.4         withr_3.0.2       magrittr_2.0.3    grid_4.3.3        rstudioapi_0.17.1 hms_1.1.3         lifecycle_1.0.4   vctrs_0.6.5       glue_1.8.0        farver_2.1.2      ragg_1.3.3        colorspace_2.1-1  tools_4.3.3       pkgconfig_2.0.3  
 

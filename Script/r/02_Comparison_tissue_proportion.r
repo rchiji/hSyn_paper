@@ -3,10 +3,9 @@ library(tidyverse)
 library(dunn.test)
 library(ggplot2)
 
-
 df <- read.delim("00_src/annotations_full.txt", sep = "\t", row.names = 1)
 
-df_OA_nonOA_RA <- df[df$Diagnosis != "SLE",]
+df_OA_nonOA_RA <- df[!df$Diagnosis %in% c("SLE", "SSc"), ]
 df_OA_nonOA_RA <- df_OA_nonOA_RA[df_OA_nonOA_RA$Joint == "Knee",]
 
 component <- colnames(df_OA_nonOA_RA[,6:17])
@@ -17,8 +16,8 @@ component <- colnames(df_OA_nonOA_RA[,6:17])
 shapiro_test_results <- df_OA_nonOA_RA %>% 
   summarise(across(6:17, ~ shapiro.test(.)$p.value))
 shapiro_test_results 
-#        Adipose Fibrous_tissue__dense_irregular Fibrous_tissue__dense_regular Fibrous_tissue__loose          TLS       Plasma       Stroma      Lining       Muscle          RBC Micro_vessel Large_vessel
-# 1 1.003404e-06                    2.705474e-08                   1.60232e-17            0.01359999 1.987955e-21 1.693646e-19 3.202193e-22 5.46652e-13 4.694428e-23 8.222257e-17 0.0005710695 7.777662e-14
+#        Adipose Fibrous_tissue__dense_irregular Fibrous_tissue__dense_regular Fibrous_tissue__loose          TLS       Plasma       Stroma       Lining       Muscle          RBC Micro_vessel Large_vessel
+# 1 8.335292e-07                    3.509635e-08                  1.856782e-17            0.01145201 2.528112e-21 2.191833e-19 3.852913e-22 7.103635e-13 5.921528e-23 1.052633e-16 0.0006813595 5.238785e-14
 
 ## kruskal.test
 results <- list()
@@ -55,154 +54,52 @@ for (comp in component) {
   }
 }
 
-# --- Results for Adipose ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Adipose by Diagnosis
-# Kruskal-Wallis chi-squared = 2.1599, df = 2, p-value = 0.3396
-# 
-# 
-# --- Results for Fibrous_tissue__dense_irregular ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Fibrous_tissue__dense_irregular by Diagnosis
-# Kruskal-Wallis chi-squared = 10.115, df = 2, p-value = 0.006361
-# 
-# 
+# Notes: Significant differences are shown.
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__dense_irregular **
 # =============================================
-# >> Comparison: nonOA - OA - Adjusted P-value: 0.08763 - Z-value: 1.35552
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.08356 - Z-value: -1.59185
-# >> Comparison: OA - RA    - Adjusted P-value: 0.00352 - Z-value: -3.04230
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.08805 - Z-value: 1.35285
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.08687 - Z-value: -1.57255
+# >> Comparison: OA - RA    - Adjusted P-value: 0.00384 - Z-value: -3.01580
 # =============================================
-# 
-# --- Results for Fibrous_tissue__dense_regular ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Fibrous_tissue__dense_regular by Diagnosis
-# Kruskal-Wallis chi-squared = 15.528, df = 2, p-value = 0.0004247
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__dense_regular **
 # =============================================
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.00027 - Z-value: -3.74903
-# >> Comparison: OA - RA    - Adjusted P-value: 0.00027 - Z-value: -3.56907
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.00028 - Z-value: -3.74079
+# >> Comparison: OA - RA    - Adjusted P-value: 0.00024 - Z-value: -3.59462
 # =============================================
-# 
-# --- Results for Fibrous_tissue__loose ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Fibrous_tissue__loose by Diagnosis
-# Kruskal-Wallis chi-squared = 4.5066, df = 2, p-value = 0.1051
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__loose **
 # =============================================
-# >> Comparison: OA - RA    - Adjusted P-value: 0.05100 - Z-value: 2.12010
+# >> Comparison: OA - RA    - Adjusted P-value: 0.05296 - Z-value: 2.10485
 # =============================================
-# 
-# --- Results for TLS ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  TLS by Diagnosis
-# Kruskal-Wallis chi-squared = 20.361, df = 2, p-value = 3.789e-05
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for TLS **
 # =============================================
-# >> Comparison: nonOA - OA - Adjusted P-value: 0.00009 - Z-value: -4.01335
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.00005 - Z-value: -3.98194
-# >> Comparison: OA - RA    - Adjusted P-value: 0.07171 - Z-value: -1.46315
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.00008 - Z-value: -4.05409
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.00005 - Z-value: -3.98247
+# >> Comparison: OA - RA    - Adjusted P-value: 0.07704 - Z-value: -1.42526
 # =============================================
-# 
-# --- Results for Plasma ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Plasma by Diagnosis
-# Kruskal-Wallis chi-squared = 12.963, df = 2, p-value = 0.001532
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for Plasma **
 # =============================================
-# >> Comparison: nonOA - OA - Adjusted P-value: 0.00052 - Z-value: -3.57777
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.01335 - Z-value: -2.36968
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.00054 - Z-value: -3.56943
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.01394 - Z-value: -2.35359
 # =============================================
-# 
-# --- Results for Stroma ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Stroma by Diagnosis
-# Kruskal-Wallis chi-squared = 11.725, df = 2, p-value = 0.002844
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for Stroma **
 # =============================================
-# >> Comparison: nonOA - RA - Adjusted P-value: 0.00252 - Z-value: -2.93253
-# >> Comparison: OA - RA    - Adjusted P-value: 0.00121 - Z-value: -3.35012
+# >> Comparison: nonOA - RA - Adjusted P-value: 0.00228 - Z-value: -2.96310
+# >> Comparison: OA - RA    - Adjusted P-value: 0.00088 - Z-value: -3.43900
 # =============================================
-# 
-# --- Results for Lining ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Lining by Diagnosis
-# Kruskal-Wallis chi-squared = 9.696, df = 2, p-value = 0.007844
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for Lining **
 # =============================================
-# >> Comparison: nonOA - OA - Adjusted P-value: 0.02945 - Z-value: -2.06135
-# >> Comparison: OA - RA    - Adjusted P-value: 0.01373 - Z-value: 2.60639
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.02876 - Z-value: -2.07111
+# >> Comparison: OA - RA    - Adjusted P-value: 0.01327 - Z-value: 2.61787
 # =============================================
-# 
-# --- Results for Muscle ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Muscle by Diagnosis
-# Kruskal-Wallis chi-squared = 3.236, df = 2, p-value = 0.1983
-# 
-# 
-# --- Results for RBC ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  RBC by Diagnosis
-# Kruskal-Wallis chi-squared = 15.989, df = 2, p-value = 0.0003373
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for RBC **
 # =============================================
-# >> Comparison: nonOA - OA - Adjusted P-value: 0.00024 - Z-value: -3.77169
-# >> Comparison: OA - RA    - Adjusted P-value: 0.04746 - Z-value: 1.85722
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.00022 - Z-value: -3.79351
+# >> Comparison: OA - RA    - Adjusted P-value: 0.04369 - Z-value: 1.89376
 # =============================================
-# 
-# --- Results for Micro_vessel ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Micro_vessel by Diagnosis
-# Kruskal-Wallis chi-squared = 4.0286, df = 2, p-value = 0.1334
-# 
-# 
 # ** Significant Dunn Post-hoc Test Results for Micro_vessel **
 # =============================================
-# >> Comparison: nonOA - OA - Adjusted P-value: 0.07353 - Z-value: 1.96843
+# >> Comparison: nonOA - OA - Adjusted P-value: 0.07775 - Z-value: 1.94453
 # =============================================
-# 
-# --- Results for Large_vessel ---
-# 
-# 	Kruskal-Wallis rank sum test
-# 
-# data:  Large_vessel by Diagnosis
-# Kruskal-Wallis chi-squared = 1.0987, df = 2, p-value = 0.5773
 
 
 # Plot
@@ -257,27 +154,3 @@ p <- ggplot(df_log_long, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
 ggsave("99_Fig/fig2/nonOA_OA_RA_tissue_proportion.png", plot = p , width = 6, height = 2)
 ggsave("99_Fig/fig2/nonOA_OA_RA_tissue_proportion.pdf", plot = p , width = 6, height = 2)
 
-
-sessionInfo()
-# R version 4.3.3 (2024-02-29 ucrt)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 11 x64 (build 26200)
-# 
-# Matrix products: default
-# 
-# 
-# locale:
-#  [1] LC_COLLATE=Japanese_Japan.utf8  LC_CTYPE=Japanese_Japan.utf8    LC_MONETARY=Japanese_Japan.utf8 LC_NUMERIC=C                    LC_TIME=Japanese_Japan.utf8    
-# 
-# time zone: Asia/Tokyo
-# tzcode source: internal
-# 
-# attached base packages:
-#  [1] stats     graphics  grDevices utils     datasets  methods   base     
-# 
-# other attached packages:
-#  [1] lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1   purrr_1.0.4     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.1   tidyverse_2.0.0 dunn.test_1.3.6 dplyr_1.1.4    
-# 
-# loaded via a namespace (and not attached):
-#  [1] gtable_0.3.6      compiler_4.3.3    tidyselect_1.2.1  systemfonts_1.2.1 scales_1.3.0      textshaping_1.0.0 R6_2.6.1          labeling_0.4.3    generics_0.1.3    munsell_0.5.1     pillar_1.10.1     tzdb_0.5.0        rlang_1.1.5       stringi_1.8.7     timechange_0.3.0 
-# [16] cli_3.6.4         withr_3.0.2       magrittr_2.0.3    grid_4.3.3        rstudioapi_0.17.1 hms_1.1.3         lifecycle_1.0.4   vctrs_0.6.5       glue_1.8.0        farver_2.1.2      ragg_1.3.3        colorspace_2.1-1  tools_4.3.3       pkgconfig_2.0.3  

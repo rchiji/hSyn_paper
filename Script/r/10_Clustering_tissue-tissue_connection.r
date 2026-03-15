@@ -5,7 +5,7 @@ library(dplyr)
 library(tidyverse)
 
 df <- read.delim("00_src/annotations_full.txt", sep = "\t", row.names = 1)
-score <- read.delim("00_src/annotations_full_OARSI_Krenn.txt", sep = "\t", row.names = 1)
+score <- read.delim("01_formatted/annotations_full_OARSI_Krenn.txt", sep = "\t", row.names = 1)
 df[,37:41]  <- score[,1:5]
 df <- df[df$Joint == "Knee",]
 
@@ -33,8 +33,8 @@ tsne_data$Diagnosis <- df$Diagnosis
 plot_tsne <- ggplot(tsne_data, aes(x = tSNE1, y = tSNE2, color = cluster, shape = Diagnosis)) + 
   geom_point(size = 0.5) +
   scale_color_manual(values = c("1" = "#D8C6C2", "2" = "#F3B2A6", "3" = "#C73A3A", "4" = "#7F1212")) +
-  scale_shape_manual(values = c("nonOA" = 16, "RA" = 15, "OA" = 17, "SLE" = 18),
-                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA", "SLE" = "SLE")) +
+  scale_shape_manual(values = c("nonOA" = 16, "RA" = 15, "OA" = 17, "SLE" = 18, "SSc" = 18),
+                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
   labs(x = "tSNE1", y = "tSNE2", shape = "Diagnosis", color = "kmeans cluster") +
   theme_classic() +
   theme(
@@ -52,10 +52,12 @@ plot_tsne <- ggplot(tsne_data, aes(x = tSNE1, y = tSNE2, color = cluster, shape 
     legend.box.margin = margin(0, 0, 0, -8)
   )
 
-ggsave("99_Fig/fig4/tSNE.png", plot = plot_tsne, width = 2, height = 1.5)
-ggsave("99_Fig/fig4/tSNE.pdf", plot = plot_tsne, width = 2, height = 1.5)
+ggsave("99_Fig/fig4/tSNE.png", plot = plot_tsne, width = 2.5, height = 1.5)
+ggsave("99_Fig/fig4/tSNE.pdf", plot = plot_tsne, width = 2.5, height = 1.5)
 
 df[,42:44] <- tsne_data[,1:3]
+
+# write.table(df, "01_formatted/annotations_full_tissue_conection_cluster.txt", sep = "\t", row.names = TRUE, col.names = NA)
 
 
 # Proportion
@@ -121,7 +123,6 @@ for (score in scores) {
   )
 }
 
-cat("\n========== Kruskal-Wallis Results ==========\n")
 for (score in scores) {
   cat("\n--- Results for", score, "---\n")
   print(results[[score]]$main_test)
@@ -138,35 +139,30 @@ for (score in scores) {
   }
 }
 
-# ###
+# Notes: Significant differences are shown.
 # ** Significant Dunn Post-hoc Test Results for Pre__KOOS_Pain **
 # =============================================
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.06592 - Z-value: 2.29083
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.08345 - Z-value: 2.19988
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Pre__KOOS_Symptom **
 # =============================================
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.03192 - Z-value: -2.30295
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.08003 - Z-value: -1.75051
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.01688 - Z-value: 2.76876
-# =============================================
-# ** Significant Dunn Post-hoc Test Results for Pre__KOOS_ADL **
-# =============================================
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.09952 - Z-value: 2.12999
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.03245 - Z-value: -2.29676
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.08056 - Z-value: -1.74746
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.01084 - Z-value: 2.91003
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Pre__KOOS_QOL **
 # =============================================
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.04230 - Z-value: 2.45468
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.05752 - Z-value: 2.34214
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Post_3Month__KOOS_Sports **
 # =============================================
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.08043 - Z-value: -2.21429
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.08091 - Z-value: -2.21197
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Post_3Month__KOOS_QOL **
 # =============================================
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.02606 - Z-value: -2.62410
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.09469 - Z-value: 1.85830
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.02777 - Z-value: -2.60248
 # =============================================
-# ###
+# 
 # ** Significant Dunn Post-hoc Test Results for Synovitis_score **
 # =============================================
 # >> Comparison: 1 - 2      - Adjusted P-value: 0.03687 - Z-value: -2.24795
@@ -175,106 +171,104 @@ for (score in scores) {
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Krenn_Lining **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.06834 - Z-value: -1.68953
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00462 - Z-value: 2.83254
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00002 - Z-value: 4.51048
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.07702 - Z-value: 1.42540
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00194 - Z-value: 3.21739
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.07428 - Z-value: -1.53901
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.07107 - Z-value: -1.67078
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00480 - Z-value: 2.81991
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00002 - Z-value: 4.48033
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.08421 - Z-value: 1.37731
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00272 - Z-value: 3.11958
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.07456 - Z-value: -1.53711
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Krenn_Infiltrate **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.04106 - Z-value: -2.20613
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.04434 - Z-value: 2.43769
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.08326 - Z-value: -1.73210
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.04112 - Z-value: -2.20557
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.04396 - Z-value: 2.44087
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.07949 - Z-value: -1.61653
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.05675 - Z-value: -1.90523
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Total **
 # =============================================
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.03037 - Z-value: 2.32178
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00127 - Z-value: 3.52527
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.06341 - Z-value: 1.72492
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.06128 - Z-value: -1.87144
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.03122 - Z-value: 2.31131
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00140 - Z-value: 3.49938
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.08396 - Z-value: 1.58948
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.05477 - Z-value: -1.92073
 # =============================================
-# ###
+# 
 # ** Significant Dunn Post-hoc Test Results for Adipose **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.01294 - Z-value: -2.29800
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00000 - Z-value: -5.84883
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00003 - Z-value: -4.12995
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.00000 - Z-value: -6.17628
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00002 - Z-value: -4.32226
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.01193 - Z-value: -2.32844
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00000 - Z-value: -5.83064
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00003 - Z-value: -4.08343
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.00000 - Z-value: -6.13661
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00002 - Z-value: -4.27120
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__dense_irregular **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: 6.64320
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.07784 - Z-value: 1.51514
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00001 - Z-value: -4.34779
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.00000 - Z-value: 5.62518
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.00025 - Z-value: 3.58963
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: 6.60147
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.07633 - Z-value: 1.52514
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00002 - Z-value: -4.29982
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.00000 - Z-value: 5.60744
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.00025 - Z-value: 3.59134
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__dense_regular **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: 4.93057
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00170 - Z-value: -3.25521
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.00611 - Z-value: 2.74202
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.03482 - Z-value: -1.99144
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.09862 - Z-value: 1.39055
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: 4.90431
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00168 - Z-value: -3.25831
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.00442 - Z-value: 2.84631
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.05549 - Z-value: -1.78669
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.07596 - Z-value: 1.52766
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__loose **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: -5.26862
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00000 - Z-value: 6.16966
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00002 - Z-value: 4.21687
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.01782 - Z-value: -2.26095
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: -5.22467
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00000 - Z-value: 6.12498
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00003 - Z-value: 4.15130
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.02097 - Z-value: -2.19780
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for TLS **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.07562 - Z-value: -1.77666
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.09697 - Z-value: 1.51688
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00417 - Z-value: 3.19648
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.02143 - Z-value: -2.45001
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.07353 - Z-value: -1.78955
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.09443 - Z-value: 1.53043
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00381 - Z-value: 3.22236
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.01085 - Z-value: -2.68604
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Plasma **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00010 - Z-value: -4.14294
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00006 - Z-value: 4.11134
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.00041 - Z-value: -3.45820
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.00044 - Z-value: -3.51645
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00012 - Z-value: -4.10120
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00007 - Z-value: 4.06959
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.00035 - Z-value: -3.50247
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.00038 - Z-value: -3.55572
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Stroma **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00413 - Z-value: 2.99376
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00639 - Z-value: 3.07131
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.05568 - Z-value: 1.91352
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00375 - Z-value: 3.02317
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00583 - Z-value: 3.09852
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.03070 - Z-value: 2.16089
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Lining **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.01516 - Z-value: -2.32228
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00905 - Z-value: 2.61032
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00000 - Z-value: 4.84218
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00062 - Z-value: 3.53251
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.06768 - Z-value: -1.58571
-# =============================================
-# ** Significant Dunn Post-hoc Test Results for Muscle **
-# =============================================
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.07559 - Z-value: 1.95664
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.01616 - Z-value: -2.29818
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00946 - Z-value: 2.59512
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00000 - Z-value: 4.80451
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00088 - Z-value: 3.43808
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.06992 - Z-value: -1.56946
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for RBC **
 # =============================================
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.03547 - Z-value: 2.51737
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.03901 - Z-value: 2.48366
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Micro_vessel **
 # =============================================
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00017 - Z-value: 3.86321
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00006 - Z-value: 4.25628
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.00440 - Z-value: 2.75547
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00168 - Z-value: 3.14191
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00019 - Z-value: 3.83799
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00007 - Z-value: 4.23000
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.00642 - Z-value: 2.62892
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00271 - Z-value: 2.99855
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.09584 - Z-value: -1.40595
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Large_vessel **
 # =============================================
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00562 - Z-value: -2.89871
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00150 - Z-value: -3.48123
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.01646 - Z-value: 2.39861
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00530 - Z-value: -2.91708
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00137 - Z-value: -3.50581
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.00856 - Z-value: 2.62909
 # =============================================
 
 
@@ -319,8 +313,8 @@ plot_tissue <- ggplot(df_long, aes(x = cluster, y = Value, color = cluster)) +
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
 
-ggsave("99_Fig/fig4/tSNE_cluster_tissue_proportion.png", plot = plot_tissue, width = 6, height = 2)
-ggsave("99_Fig/fig4/tSNE_cluster_tissue_proportion.pdf", plot = plot_tissue, width = 6, height = 2)
+ggsave("99_Fig/sup_fig5/tSNE_cluster_tissue_proportion.png", plot = plot_tissue, width = 6, height = 2)
+ggsave("99_Fig/sup_fig5/tSNE_cluster_tissue_proportion.pdf", plot = plot_tissue, width = 6, height = 2)
 
 
 df_long_KOOOS <- df_OA %>%
@@ -563,32 +557,4 @@ plot_KL <- ggplot(df_KL, aes(x = cluster, y = n, fill = KL_grade)) +
 
 ggsave("99_Fig/fig4/tSNE_cluster_KL.png", plot = plot_KL, width = 1.5, height = 1.25)
 ggsave("99_Fig/fig4/tSNE_cluster_KL.pdf", plot = plot_KL, width = 1.5, height = 1.25)
-
-
-write.table(df, "01_formatted/annotations_full_tissue_conection_cluster.txt", sep = "\t", row.names = TRUE, col.names = NA)
-
-
-sessionInfo()
-# R version 4.3.3 (2024-02-29 ucrt)
-# Platform: x86_64-w64-mingw32/x64 (64-bit)
-# Running under: Windows 11 x64 (build 26200)
-# 
-# Matrix products: default
-# 
-# 
-# locale:
-#  [1] LC_COLLATE=Japanese_Japan.utf8  LC_CTYPE=Japanese_Japan.utf8    LC_MONETARY=Japanese_Japan.utf8 LC_NUMERIC=C                    LC_TIME=Japanese_Japan.utf8    
-# 
-# time zone: Asia/Tokyo
-# tzcode source: internal
-# 
-# attached base packages:
-#  [1] stats     graphics  grDevices utils     datasets  methods   base     
-# 
-# other attached packages:
-#  [1] lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1   purrr_1.0.4     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    tidyverse_2.0.0 dplyr_1.1.4     dunn.test_1.3.6 ggplot2_3.5.1   Rtsne_0.17     
-# 
-# loaded via a namespace (and not attached):
-#  [1] vctrs_0.6.5       cli_3.6.4         rlang_1.1.5       stringi_1.8.7     generics_0.1.3    glue_1.8.0        colorspace_2.1-1  hms_1.1.3         scales_1.3.0      grid_4.3.3        munsell_0.5.1     tzdb_0.5.0        lifecycle_1.0.4   compiler_4.3.3    timechange_0.3.0 
-# [16] Rcpp_1.0.14       pkgconfig_2.0.3   rstudioapi_0.17.1 R6_2.6.1          tidyselect_1.2.1  pillar_1.10.1     magrittr_2.0.3    tools_4.3.3       withr_3.0.2       gtable_0.3.6 
 
