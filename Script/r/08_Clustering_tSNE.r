@@ -3,6 +3,7 @@ library(ggplot2)
 library(dunn.test)
 library(dplyr)
 library(tidyverse)
+library(compositions)
 
 df <- read.delim("00_src/annotations_full.txt", sep = "\t", row.names = 1)
 score <- read.delim("01_formatted/annotations_full_OARSI_Krenn.txt", sep = "\t", row.names = 1)
@@ -27,7 +28,7 @@ plot_tsne <- ggplot(tsne_data, aes(x = tSNE1, y = tSNE2, color = cluster, shape 
   geom_point(size = 0.5) +
   scale_color_manual(values = c("1" = "#C2BAB4", "2" = "#FEC089", "3" = "#F06A00", "4" = "#8C2D04")) +
   scale_shape_manual(values = c("nonOA" = 16, "RA" = 15, "OA" = 17, "SLE" = 18, "SSc" = 18),
-                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
+                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
   labs(x = "tSNE1", y = "tSNE2", shape = "Diagnosis", color = "kmeans cluster") +
   theme_classic() +
   theme(
@@ -64,7 +65,7 @@ plot_stacked_bar <- ggplot(df_stacked_bar, aes(x = cluster, y = n, fill = Diagno
   labs(y = "Fraction of diagnosis type", fill = "Diagnosis") +
   scale_y_continuous(labels = function(x) x * 100) +
   scale_fill_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e", "SLE" = "grey80", "SSc" = "grey80"),
-                    labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
+                    labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
   theme_classic() +
   theme(
     plot.title = element_blank(),
@@ -93,9 +94,8 @@ df_OA <- df[df$Diagnosis == "OA",]
 
 scores <- colnames(df_OA[,18:32])
 scores_2 <- colnames(df_OA[,c(35,36,41,37:40)])
-tissue <- colnames(df_OA[,6:17])
 
-## The same applies to "score_2" and "tissue".
+## The same applies to "score_2".
 results <- list()
 for (score in scores) {
   kw_result <- kruskal.test(as.formula(paste(score, "~ cluster")), data = df_OA)
@@ -183,95 +183,247 @@ for (score in scores) {
 # >> Comparison: 2 - 4      - Adjusted P-value: 0.01285 - Z-value: -2.85646
 # >> Comparison: 3 - 4      - Adjusted P-value: 0.07176 - Z-value: -1.80062
 # =============================================
-# 
+
+
+all_component <- colnames(df_OA)[6:17]
+major_component <- c(
+  "Adipose",
+  "Fibrous_tissue__dense_irregular",
+  "Fibrous_tissue__dense_regular",
+  "Fibrous_tissue__loose"
+)
+minor_component <- setdiff(all_component, major_component)
+
+res_clr_major <- clr(acomp(df_OA[,all_component])) 
+
+df_clr_major <- as.data.frame(res_clr_major)
+df_clr_major$cluster <- df_OA$cluster
+
+
+# statistics
+## shapiro_test
+shapiro_test_results <- df_clr_major %>% 
+  summarise(across(1:12, ~ shapiro.test(.)$p.value))
+shapiro_test_results 
+#       Adipose Fibrous_tissue__dense_irregular Fibrous_tissue__dense_regular Fibrous_tissue__loose       TLS    Plasma       Stroma       Lining      Muscle       RBC Micro_vessel Large_vessel
+# 1 0.001620628                      0.01034722                     0.2144998             0.8376733 0.3980882 0.1245807 5.468267e-05 4.213218e-06 9.57414e-06 0.1283558    0.6595747   0.01884009
+
+## kruskal.test
+results <- list()
+for (comp in all_component) {
+  kw_result <- kruskal.test(as.formula(paste(comp, "~ cluster")), data = df_clr_major)
+  dunn_result <- dunn.test(df_clr_major[[comp]], df_clr_major$cluster, method = "bh")
+  significant_idx <- which(dunn_result$P.adjusted < 0.1)
+  significant_comparisons <- dunn_result$comparisons[significant_idx]
+  significant_p_adjusted <- dunn_result$P.adjusted[significant_idx]
+  significant_z <- dunn_result$Z[significant_idx]
+  results[[comp]] <- list(
+    test_type = "Kruskal-Wallis",
+    main_test = kw_result,
+    posthoc_test = dunn_result,
+    significant_comparisons = significant_comparisons,
+    significant_p_adjusted = significant_p_adjusted,
+    significant_z = significant_z
+  )
+}
+
+for (comp in all_component) {
+  cat("\n--- Results for", comp, "---\n")
+  print(results[[comp]]$main_test)
+  if (length(results[[comp]]$significant_comparisons) > 0) {
+    cat("\n** Significant Dunn Post-hoc Test Results for", comp, "**\n")
+    cat("=============================================\n")
+    for (i in seq_along(results[[comp]]$significant_comparisons)) {
+      cat(sprintf(">> Comparison: %-10s - Adjusted P-value: %.5f - Z-value: %.5f\n", 
+                  results[[comp]]$significant_comparisons[i], 
+                  results[[comp]]$significant_p_adjusted[i],
+                  results[[comp]]$significant_z[i]))
+    }
+    cat("=============================================\n")
+  }
+}
+
+# Notes: Significant differences are shown.
 # ** Significant Dunn Post-hoc Test Results for Adipose **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: -6.24292
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.06542 - Z-value: 1.51078
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00000 - Z-value: 6.93965
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.01489 - Z-value: -2.24414
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00025 - Z-value: 3.66660
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.00045 - Z-value: -3.42920
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: -5.01555
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00799 - Z-value: 2.47512
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00000 - Z-value: 6.84673
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00028 - Z-value: 3.62911
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.00056 - Z-value: -3.37317
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__dense_irregular **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.01124 - Z-value: -2.43257
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00000 - Z-value: -5.94099
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00011 - Z-value: -3.87771
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.03536 - Z-value: -1.88870
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.00008 - Z-value: 4.05524
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00208 - Z-value: -3.07831
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00002 - Z-value: -4.48304
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.04847 - Z-value: -1.84783
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.04950 - Z-value: 1.73634
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.00157 - Z-value: 3.27809
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__dense_regular **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.01312 - Z-value: -2.37619
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00000 - Z-value: -5.39298
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00074 - Z-value: -3.37424
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.00004 - Z-value: 4.19855
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00459 - Z-value: -2.83465
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00000 - Z-value: -4.97152
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00804 - Z-value: -2.55162
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.02766 - Z-value: 1.99449
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.00004 - Z-value: 4.17512
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Fibrous_tissue__loose **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: 7.14408
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00000 - Z-value: 6.34313
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.00284 - Z-value: 2.82415
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00008 - Z-value: -3.93734
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.00022 - Z-value: -3.61890
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00026 - Z-value: 3.75291
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00000 - Z-value: 5.96977
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00432 - Z-value: 2.76108
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.00633 - Z-value: 2.55733
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.00048 - Z-value: -3.49443
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for TLS **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.06132 - Z-value: 1.74060
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.05117 - Z-value: 2.11871
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.03870 - Z-value: -2.06732
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.04926 - Z-value: -2.39943
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.08239 - Z-value: -1.91945
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Plasma **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.07285 - Z-value: 1.65892
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00367 - Z-value: 3.02981
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.06384 - Z-value: 1.61458
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.02544 - Z-value: -2.23462
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.00145 - Z-value: -3.48980
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.01619 - Z-value: 2.78235
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.01878 - Z-value: 2.49709
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.04858 - Z-value: -1.97228
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.05183 - Z-value: -1.81770
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Stroma **
 # =============================================
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.00278 - Z-value: -3.31154
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00460 - Z-value: -2.96124
-# >> Comparison: 1 - 4      - Adjusted P-value: 0.01045 - Z-value: -2.56049
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.02237 - Z-value: -2.17242
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.02262 - Z-value: -2.67205
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Lining **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00002 - Z-value: 4.53945
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.01160 - Z-value: 2.52400
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.09788 - Z-value: -1.39463
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00096 - Z-value: -3.41337
-# >> Comparison: 3 - 4      - Adjusted P-value: 0.07508 - Z-value: -1.64433
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00003 - Z-value: 4.43927
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00144 - Z-value: 3.30147
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00466 - Z-value: -2.82977
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.03691 - Z-value: -1.96676
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Muscle **
 # =============================================
-# >> Comparison: 1 - 3      - Adjusted P-value: 0.05619 - Z-value: -2.08071
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.08284 - Z-value: -2.20272
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.06883 - Z-value: -2.27438
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.04794 - Z-value: -1.97791
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.04931 - Z-value: 2.13362
+# =============================================
+# ** Significant Dunn Post-hoc Test Results for RBC **
+# =============================================
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.05088 - Z-value: 2.38759
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Micro_vessel **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.00000 - Z-value: 5.04974
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.00069 - Z-value: -3.39480
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.00020 - Z-value: -3.81841
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00288 - Z-value: 3.30220
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.00795 - Z-value: 2.78815
+# >> Comparison: 1 - 4      - Adjusted P-value: 0.05159 - Z-value: 1.94651
 # =============================================
 # ** Significant Dunn Post-hoc Test Results for Large_vessel **
 # =============================================
-# >> Comparison: 1 - 2      - Adjusted P-value: 0.02751 - Z-value: -2.60569
-# >> Comparison: 2 - 3      - Adjusted P-value: 0.02449 - Z-value: 2.40157
-# >> Comparison: 2 - 4      - Adjusted P-value: 0.02648 - Z-value: 2.21914
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00353 - Z-value: -3.04198
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00617 - Z-value: 3.08175
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00357 - Z-value: 2.91398
+# =============================================
+
+
+row_sum <- rowSums(df_OA[, minor_component], na.rm = TRUE)
+
+df_recal <- df_OA
+df_recal[, minor_component] <- df_OA[, minor_component] / row_sum
+
+res_clr_minor <- clr(acomp(df_recal[,minor_component])) 
+
+df_clr_minor <- as.data.frame(res_clr_minor)
+df_clr_minor$cluster <- df_OA$cluster
+
+
+# statistics
+## shapiro_test
+shapiro_test_results <- df_clr_minor %>% 
+  summarise(across(1:8, ~ shapiro.test(.)$p.value))
+shapiro_test_results 
+#         TLS     Plasma      Stroma       Lining       Muscle        RBC Micro_vessel Large_vessel
+# 1 0.2667346 0.05463301 0.001368096 2.547756e-05 8.975871e-05 0.04094924    0.1877178    0.4792868
+
+## kruskal.test
+results <- list()
+for (comp in minor_component) {
+  kw_result <- kruskal.test(as.formula(paste(comp, "~ cluster")), data = df_clr_minor)
+  dunn_result <- dunn.test(df_clr_minor[[comp]], df_clr_minor$cluster, method = "bh")
+  significant_idx <- which(dunn_result$P.adjusted < 0.1)
+  significant_comparisons <- dunn_result$comparisons[significant_idx]
+  significant_p_adjusted <- dunn_result$P.adjusted[significant_idx]
+  significant_z <- dunn_result$Z[significant_idx]
+  results[[comp]] <- list(
+    test_type = "Kruskal-Wallis",
+    main_test = kw_result,
+    posthoc_test = dunn_result,
+    significant_comparisons = significant_comparisons,
+    significant_p_adjusted = significant_p_adjusted,
+    significant_z = significant_z
+  )
+}
+
+for (comp in minor_component) {
+  cat("\n--- Results for", comp, "---\n")
+  print(results[[comp]]$main_test)
+  if (length(results[[comp]]$significant_comparisons) > 0) {
+    cat("\n** Significant Dunn Post-hoc Test Results for", comp, "**\n")
+    cat("=============================================\n")
+    for (i in seq_along(results[[comp]]$significant_comparisons)) {
+      cat(sprintf(">> Comparison: %-10s - Adjusted P-value: %.5f - Z-value: %.5f\n", 
+                  results[[comp]]$significant_comparisons[i], 
+                  results[[comp]]$significant_p_adjusted[i],
+                  results[[comp]]$significant_z[i]))
+    }
+    cat("=============================================\n")
+  }
+}
+
+# Notes: Significant differences are shown.
+# ** Significant Dunn Post-hoc Test Results for TLS **
+# =============================================
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.06323 - Z-value: 2.03198
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.09542 - Z-value: -2.14681
+# =============================================
+# ** Significant Dunn Post-hoc Test Results for Plasma **
+# =============================================
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.02551 - Z-value: 2.23352
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.02004 - Z-value: 2.71238
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.06181 - Z-value: -1.73685
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.03442 - Z-value: -2.27431
+# =============================================
+# ** Significant Dunn Post-hoc Test Results for Stroma **
+# =============================================
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.02431 - Z-value: -2.40425
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.01156 - Z-value: -2.88980
+# =============================================
+# ** Significant Dunn Post-hoc Test Results for Lining **
+# =============================================
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00246 - Z-value: 3.34601
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.01452 - Z-value: 2.58708
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.02735 - Z-value: -2.20654
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.07551 - Z-value: -1.64157
+# =============================================
+# ** Significant Dunn Post-hoc Test Results for Muscle **
+# =============================================
+# >> Comparison: 1 - 3      - Adjusted P-value: 0.01104 - Z-value: -2.90431
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.07253 - Z-value: -1.79578
+# >> Comparison: 3 - 4      - Adjusted P-value: 0.01670 - Z-value: 2.53848
+# =============================================
+# ** Significant Dunn Post-hoc Test Results for Large_vessel **
+# =============================================
+# >> Comparison: 1 - 2      - Adjusted P-value: 0.00127 - Z-value: -3.52421
+# >> Comparison: 2 - 3      - Adjusted P-value: 0.00149 - Z-value: 3.29274
+# >> Comparison: 2 - 4      - Adjusted P-value: 0.00117 - Z-value: 3.24619
 # =============================================
 
 
 # Plot
-df_OA[, 6:17] <- log10(df_OA[, 6:17] + 1e-6)
+df_OA[,major_component] <- df_OA[,major_component]
+df_OA[,minor_component] <- df_OA[,minor_component]
 
 df_long <- df_OA %>%
   pivot_longer(cols = 6:17, names_to = "Tissue", values_to = "Value")
 
 df_long$Tissue <- factor(df_long$Tissue, levels = c("Fibrous_tissue__dense_irregular", "Fibrous_tissue__dense_regular", "Fibrous_tissue__loose", "Lining", "TLS", "Plasma", "Stroma", "RBC", "Micro_vessel", "Large_vessel", "Adipose", "Muscle"))
+df_long$cluster <- factor(df_long$cluster)
 
 custom_labels <- c(
      "Fibrous_tissue__dense_irregular" = "Fibrous tissue\n(dense.irregular)",
@@ -284,8 +436,8 @@ custom_labels <- c(
 plot_tissue <- ggplot(df_long, aes(x = cluster, y = Value, color = cluster)) +
   geom_boxplot(width = 0.6, outlier.shape = NA, linewidth = 0.1, fill = "white", color = "black") +
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
-  facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels), strip.position = "bottom", ncol = 6) + 
-  labs(y = "log10(Proportion)") +
+  facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels), strip.position = "bottom", ncol = 4) + 
+  labs(y = "CLR(Proportion)") +
   scale_color_manual(values = c("1" = "#C2BAB4", "2" = "#FEC089", "3" = "#F06A00", "4" = "#8C2D04")) +
   theme_classic() +
   theme(
@@ -306,8 +458,8 @@ plot_tissue <- ggplot(df_long, aes(x = cluster, y = Value, color = cluster)) +
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
 
-ggsave("99_Fig/fig3/tSNE_cluster_tissue_proportion.png", plot = plot_tissue, width = 6, height = 2)
-ggsave("99_Fig/fig3/tSNE_cluster_tissue_proportion.pdf", plot = plot_tissue, width = 6, height = 2)
+ggsave("99_Fig/fig3/tSNE_cluster_tissue_proportion_CLR.png", plot = plot_tissue, width = 4, height = 3)
+ggsave("99_Fig/fig3/tSNE_cluster_tissue_proportion_CLR.pdf", plot = plot_tissue, width = 4, height = 3)
 
 
 df_long_KOOOS <- df_OA %>%

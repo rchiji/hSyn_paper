@@ -11,15 +11,15 @@ Degree_df <- read.csv("00_src/Degree_df_241220.csv", sep = ",", header = TRUE, r
 
 
 anno <- df[,c(1,3,4,44)]
-anno$Diagnosis[anno$Diagnosis == "nonOA"] <- "ACLR"
+anno$Diagnosis[anno$Diagnosis == "nonOA"] <- "Trauma"
 anno$Diagnosis[anno$Diagnosis %in% c("SLE", "SSc")] <- "Other autoimmune diseases"
-anno$Diagnosis <- factor(anno$Diagnosis, levels = c("ACLR", "OA", "RA", "Other autoimmune diseases"))
+anno$Diagnosis <- factor(anno$Diagnosis, levels = c("Trauma", "OA", "RA", "Other autoimmune diseases"))
 anno$cluster <- factor(anno$cluster, levels = c("1", "2", "3", "4"))
 
 Sex_colors <- c("Male" = "#4E6FAE",
                 "Female" = "#B94E5A")
 
-Diagnosis_colors <- c("ACLR" = "#1f77b4", 
+Diagnosis_colors <- c("Trauma" = "#1f77b4", 
                       "RA" = "#2ca02c",
                       "OA" = "#ff7f0e",
                       "Other autoimmune diseases" = "grey80")

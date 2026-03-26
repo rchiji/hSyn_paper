@@ -81,7 +81,7 @@ rownames(cor_sig_2) <- ifelse(rownames(cor_sig_2) %in% names(custom_labels),
                         custom_labels[rownames(cor_sig_2)], rownames(cor_sig_2))
 colors <- colorRampPalette(c("#377EB8", "white", "#E41A1C"))(100)
 
-pdf("99_Fig/sup_fig7/Heatmap_cor_tissue_gene.pdf", width = 12, height = 3)
+pdf("99_Fig/fig2/Heatmap_cor_tissue_gene.pdf", width = 12, height = 3)
 pheatmap(cor_sig_2, 
          cluster_rows = TRUE,
          cluster_cols = TRUE,
@@ -122,8 +122,8 @@ p1 <- ggplot(df_gene_count, aes(x = tissue, y = n_genes)) +
     axis.title.y = element_blank(),
     axis.text.y = element_text(size = 6)
   )
-ggsave("99_Fig/sup_fig7/Barplot_significant_gene_counts.png", plot = p1 , width = 3, height = 2)
-ggsave("99_Fig/sup_fig7/Barplot_significant_gene_counts.pdf", plot = p1 , width = 3, height = 2)
+ggsave("99_Fig/fig2/Barplot_significant_gene_counts.png", plot = p1 , width = 3, height = 2)
+ggsave("99_Fig/fig2/Barplot_significant_gene_counts.pdf", plot = p1 , width = 3, height = 2)
 
 
 # Elastic net regression
@@ -193,6 +193,6 @@ p2 <- ggplot(df_res, aes(x = tissue, y = spearman_r)) +
     axis.title.y = element_blank(),
     axis.text.y = element_text(size = 6)
     )
-ggsave("99_Fig/sup_fig7/Barplot_prediction_performance.png", plot = p2 , width = 3, height = 2)
-ggsave("99_Fig/sup_fig7/Barplot_prediction_performance.pdf", plot = p2 , width = 3, height = 2)
+ggsave("99_Fig/fig2/Barplot_prediction_performance.png", plot = p2 , width = 3, height = 2)
+ggsave("99_Fig/fig2/Barplot_prediction_performance.pdf", plot = p2 , width = 3, height = 2)
 

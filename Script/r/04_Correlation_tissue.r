@@ -49,9 +49,12 @@ rownames(mat) <- ifelse(rownames(mat) %in% names(custom_labels),
 colnames(mat) <- ifelse(colnames(mat) %in% names(custom_labels),
                         custom_labels[colnames(mat)], colnames(mat))
 
+max_val <- max(abs(mat), na.rm = TRUE)
+breaks <- seq(-max_val, max_val, length.out = 101)
+
 colors <- colorRampPalette(c("#377EB8", "white", "#E41A1C"))(100)
 
-png("99_Fig/fig2/corr_tissue_clr.png", width = 3.25, height = 3.25, units = "in", res = 300)
+png("99_Fig/sup_fig3/corr_tissue_clr.png", width = 3.25, height = 3.25, units = "in", res = 300)
 plot_tissue  <- pheatmap(mat,
                          display_numbers = p,
                          angle_col = 90,
@@ -59,11 +62,12 @@ plot_tissue  <- pheatmap(mat,
                          cellwidth = 10,
                          cellheight = 10,
                          color = colors,
+                         breaks = breaks,
                          treeheight_row = 20,
                          treeheight_col = 20,
                          )
 dev.off()
-pdf("99_Fig/fig2/corr_tissue_clr.pdf", width = 3.25, height = 3.25)
+pdf("99_Fig/sup_fig3/corr_tissue_clr.pdf", width = 3.25, height = 3.25)
 plot_tissue  <- pheatmap(mat,
                          display_numbers = p,
                          angle_col = 90,
@@ -71,6 +75,7 @@ plot_tissue  <- pheatmap(mat,
                          cellwidth = 10,
                          cellheight = 10,
                          color = colors,
+                         breaks = breaks,
                          treeheight_row = 20,
                          treeheight_col = 20,
 )

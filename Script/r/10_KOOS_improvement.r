@@ -48,8 +48,8 @@ p <- ggplot(df_pain_long, aes(x = KOOS, y = Value, group = Donor, color = Improv
         legend.box.margin = margin(0, 0, 0, 0),
         legend.margin     = margin(0, 0, 0, 0))
 
-ggsave("99_Fig/sup_fig3/KOOS_pain_improvement_3point.png", plot = p, width = 2, height = 2.5)
-ggsave("99_Fig/sup_fig3/KOOS_pain_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig5/KOOS_pain_improvement_3point.png", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig5/KOOS_pain_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
 
 df_pain <- df_pain %>%
   mutate(Improvement = ifelse(ImprovementValue < 10, "Remained stable", "Improved"))
@@ -121,8 +121,8 @@ p <- ggplot(df_symptom_long, aes(x = KOOS, y = Value, group = Donor, color = Imp
         legend.box.margin = margin(0, 0, 0, 0),
         legend.margin     = margin(0, 0, 0, 0))
 
-ggsave("99_Fig/sup_fig3/KOOS_symptom_improvement_3point.png", plot = p, width = 2, height = 2.5)
-ggsave("99_Fig/sup_fig3/KOOS_symptom_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig5/KOOS_symptom_improvement_3point.png", plot = p, width = 2, height = 2.5)
+ggsave("99_Fig/sup_fig5/KOOS_symptom_improvement_3point.pdf", plot = p, width = 2, height = 2.5)
 
 df_symptom <- df_symptom %>% 
   mutate(Improvement = ifelse(ImprovementValue < 10, "Remained stable", "Improved"))

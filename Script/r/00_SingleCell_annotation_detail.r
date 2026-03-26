@@ -137,8 +137,8 @@ p_Dot <- DotPlot(sc_fib_lining, features = unique(all.markers_top10$gene), dot.s
     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_stromal_lining.png", p_Dot, height = 1.5, width = 5)
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_stromal_lining.pdf", p_Dot, height = 1.5, width = 5)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_stromal_lining.png", p_Dot, height = 1.5, width = 5)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_stromal_lining.pdf", p_Dot, height = 1.5, width = 5)
 
 p_Dot2 <- DotPlot(sc_fib_lining, features = c("CLIC5","CD55","PRG4","LRRC15","MMP3"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -160,8 +160,8 @@ p_Dot2 <- DotPlot(sc_fib_lining, features = c("CLIC5","CD55","PRG4","LRRC15","MM
     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_stromal_lining.png", p_Dot2, height = 1.5, width = 3)
-ggsave("99_Fig/sup_fig7/Dot_class3_stromal_lining.pdf", p_Dot2, height = 1.5, width = 3)
+ggsave("99_Fig/sup_fig10/Dot_class3_stromal_lining.png", p_Dot2, height = 1.5, width = 3)
+ggsave("99_Fig/sup_fig10/Dot_class3_stromal_lining.pdf", p_Dot2, height = 1.5, width = 3)
 
 p_Dot3 <- DotPlot(sc_fib_lining, features = c("MMP3","MMP9","MMP13","ADAMTS4","CTSK","CTSS","CTSG","TPSB2","TPSAB1"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -183,8 +183,8 @@ p_Dot3 <- DotPlot(sc_fib_lining, features = c("MMP3","MMP9","MMP13","ADAMTS4","C
     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_stromal_lining.png", p_Dot3, height = 1.5, width = 4)
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_stromal_lining.pdf", p_Dot3, height = 1.5, width = 4)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_stromal_lining.png", p_Dot3, height = 1.5, width = 4)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_stromal_lining.pdf", p_Dot3, height = 1.5, width = 4)
 
 
 sc_fib_sublining <- subset(sc_stromal, idents = "Sublining-layer fibroblast")
@@ -253,8 +253,8 @@ p_Dot <- DotPlot(sc_fib_sublining, features = unique(all.markers_top10$gene), do
     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_stromal_sublining.png", p_Dot, height = 1.5, width = 6)
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_stromal_sublining.pdf", p_Dot, height = 1.5, width = 6)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_stromal_sublining.png", p_Dot, height = 1.5, width = 6)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_stromal_sublining.pdf", p_Dot, height = 1.5, width = 6)
 
 p_Dot2 <- DotPlot(sc_fib_sublining, features = c("COL1A1","COL3A1","LRRC15","MMP3","THY1","SPP1","ACAN","CDH11","CXCL12","CD74","IL6","APOD","CXCL14","CD34","MFAP5","PI16"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -276,8 +276,8 @@ p_Dot2 <- DotPlot(sc_fib_sublining, features = c("COL1A1","COL3A1","LRRC15","MMP
     legend.box.margin = margin(t = 0, r = 0, b = -10, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_stromal_sublining.png", p_Dot2, height = 1.5, width = 4.5)
-ggsave("99_Fig/sup_fig7/Dot_class3_stromal_sublining.pdf", p_Dot2, height = 1.5, width = 4.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_stromal_sublining.png", p_Dot2, height = 1.5, width = 4.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_stromal_sublining.pdf", p_Dot2, height = 1.5, width = 4.5)
 
 p_Dot3 <- DotPlot(sc_fib_sublining, features = c("MMP3","MMP9","MMP13","ADAMTS4","CTSK","CTSS","CTSG","TPSB2","TPSAB1"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -299,8 +299,8 @@ p_Dot3 <- DotPlot(sc_fib_sublining, features = c("MMP3","MMP9","MMP13","ADAMTS4"
     legend.box.margin = margin(t = 0, r = 0, b = -10, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_stromal_sublining.png", p_Dot3, height = 1.5, width = 4)
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_stromal_sublining.pdf", p_Dot3, height = 1.5, width = 4)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_stromal_sublining.png", p_Dot3, height = 1.5, width = 4)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_stromal_sublining.pdf", p_Dot3, height = 1.5, width = 4)
 
 
 
@@ -442,8 +442,8 @@ p_Dot <- DotPlot(sc_endothelial, features = unique(all.markers_top10$gene), dot.
     legend.box.margin = margin(t = 0, r = 0, b = -5, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_vessel_ec.png", p_Dot, height = 1.5, width = 6.5)
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_vessel_ec.pdf", p_Dot, height = 1.5, width = 6.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_vessel_ec.png", p_Dot, height = 1.5, width = 6.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_vessel_ec.pdf", p_Dot, height = 1.5, width = 6.5)
 
 p_Dot2 <- DotPlot(sc_endothelial, features = c("SEMA3G","SOX17","NOTCH4","RGCC","SPARC","LIFR","ICAM1","ACKR1","NR2F2","CCL21"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -465,8 +465,8 @@ p_Dot2 <- DotPlot(sc_endothelial, features = c("SEMA3G","SOX17","NOTCH4","RGCC",
     legend.box.margin = margin(t = 0, r = 0, b = -5, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_vessel_ec.png", p_Dot2, height = 1.5, width = 3.5)
-ggsave("99_Fig/sup_fig7/Dot_class3_vessel_ec.pdf", p_Dot2, height = 1.5, width = 3.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_vessel_ec.png", p_Dot2, height = 1.5, width = 3.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_vessel_ec.pdf", p_Dot2, height = 1.5, width = 3.5)
 
 p_Dot3 <- DotPlot(sc_endothelial, features = c("MMP3","MMP9","ADAMTS4","CTSK","CTSS","CTSG","TPSB2","TPSAB1"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -488,8 +488,8 @@ p_Dot3 <- DotPlot(sc_endothelial, features = c("MMP3","MMP9","ADAMTS4","CTSK","C
     legend.box.margin = margin(t = 0, r = 0, b = -10, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_vessel_ec.png", p_Dot3, height = 1.5, width = 3)
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_vessel_ec.pdf", p_Dot3, height = 1.5, width = 3)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_vessel_ec.png", p_Dot3, height = 1.5, width = 3)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_vessel_ec.pdf", p_Dot3, height = 1.5, width = 3)
 
 
 sc_mural <- subset(sc_vessel, idents = "Mural cell")
@@ -557,8 +557,8 @@ p_Dot <- DotPlot(sc_mural, features = unique(all.markers_top10$gene), dot.scale 
     legend.box.margin = margin(t = 0, r = 0, b = -10, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_vessel_mural.png", p_Dot, height = 1.5, width = 4.5)
-ggsave("99_Fig/sup_fig7/Dot_class3_DEG_vessel_mural.pdf", p_Dot, height = 1.5, width = 4.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_vessel_mural.png", p_Dot, height = 1.5, width = 4.5)
+ggsave("99_Fig/sup_fig10/Dot_class3_DEG_vessel_mural.pdf", p_Dot, height = 1.5, width = 4.5)
 
 p_Dot2 <- DotPlot(sc_mural, features = c("ACTA2","MYH11","RERGL","CASQ2","KCNAB1","HMCN2","FLNC","PDGFRB","RGS5","ABCC9","KCNJ8","AGT"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -580,8 +580,8 @@ p_Dot2 <- DotPlot(sc_mural, features = c("ACTA2","MYH11","RERGL","CASQ2","KCNAB1
     legend.box.margin = margin(t = 0, r = 0, b = -10, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_vessel_mural.png", p_Dot2, height = 1.5, width = 4)
-ggsave("99_Fig/sup_fig7/Dot_class3_vessel_mural.pdf", p_Dot2, height = 1.5, width = 4)
+ggsave("99_Fig/sup_fisup_fig10g7/Dot_class3_vessel_mural.png", p_Dot2, height = 1.5, width = 4)
+ggsave("99_Fig/sup_fig10/Dot_class3_vessel_mural.pdf", p_Dot2, height = 1.5, width = 4)
 
 p_Dot3 <- DotPlot(sc_mural, features = c("MMP3","MMP9","ADAMTS4","CTSK","CTSS","CTSG","TPSB2","TPSAB1"), dot.scale = 2) + 
   scale_color_gradient2(low = "#B3D3E8", mid = "grey90", high = "#B94E5A", midpoint = 0) +
@@ -603,6 +603,6 @@ p_Dot3 <- DotPlot(sc_mural, features = c("MMP3","MMP9","ADAMTS4","CTSK","CTSS","
     legend.box.margin = margin(t = 0, r = 0, b = -10, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_vessel_mural.png", p_Dot3, height = 1.5, width = 3)
-ggsave("99_Fig/sup_fig7/Dot_class3_catabolic_vessel_mural.pdf", p_Dot3, height = 1.5, width = 3)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_vessel_mural.png", p_Dot3, height = 1.5, width = 3)
+ggsave("99_Fig/sup_fig10/Dot_class3_catabolic_vessel_mural.pdf", p_Dot3, height = 1.5, width = 3)
 

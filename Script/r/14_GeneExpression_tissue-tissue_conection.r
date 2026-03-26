@@ -56,7 +56,7 @@ tmp <- data_norm %>%
   select(-id) %>% 
   column_to_rownames(var = "symbol")
 
-pdf("99_Fig/sup_fig6/Heatmap_variable_top200.pdf", width = 7, height = 12)
+pdf("99_Fig/fig4/Heatmap_variable_top200.pdf", width = 7, height = 12)
 pheatmap(tmp, 
          cluster_rows = TRUE,
          cluster_cols = FALSE,

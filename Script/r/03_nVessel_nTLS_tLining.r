@@ -255,7 +255,7 @@ p1 <- ggplot(df_long_lining, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
   labs(x = "Lining", y = "Mean thickness") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
   theme_classic() +
   theme(
     panel.border = element_blank(),
@@ -271,15 +271,15 @@ p1 <- ggplot(df_long_lining, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
-ggsave("99_Fig/fig2/nonOA_OA_RA_Lining_thickness.png", plot = p1 , width = 1.8, height = 1.25)
-ggsave("99_Fig/fig2/nonOA_OA_RA_Lining_thickness.pdf", plot = p1 , width = 1.8, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_Lining_thickness.png", plot = p1 , width = 1.8, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_Lining_thickness.pdf", plot = p1 , width = 1.8, height = 1.25)
 
 p2 <- ggplot(df_long_number_tls, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
   geom_violin(trim = FALSE, width = 0.5, linewidth = 0.1, fill = "white", color = "black") +
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
   labs(x = "TLS", y = "Number") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
   theme_classic() +
   theme(
     panel.border = element_blank(),
@@ -295,15 +295,15 @@ p2 <- ggplot(df_long_number_tls, aes(x = Diagnosis, y = Value, color = Diagnosis
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
-ggsave("99_Fig/fig2/nonOA_OA_RA_tls_num.png", plot = p2 , width = 1.8, height = 1.25)
-ggsave("99_Fig/fig2/nonOA_OA_RA_tls_num.pdf", plot = p2 , width = 1.8, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_tls_num.png", plot = p2 , width = 1.8, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_tls_num.pdf", plot = p2 , width = 1.8, height = 1.25)
 
 p3 <- ggplot(df_long_ratio_tls, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
   geom_violin(trim = FALSE, width = 0.5, linewidth = 0.1, fill = "white", color = "black") +
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
   labs(x = "TLS", y = "Number/Area") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
   scale_y_continuous(limits = c(0, 3e-06)) +
   theme_classic() +
   theme(
@@ -320,8 +320,8 @@ p3 <- ggplot(df_long_ratio_tls, aes(x = Diagnosis, y = Value, color = Diagnosis)
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
-ggsave("99_Fig/fig2/nonOA_OA_RA_tls_ratio.png", plot = p3 , width = 1.8, height = 1.25)
-ggsave("99_Fig/fig2/nonOA_OA_RA_tls_ratio.pdf", plot = p3 , width = 1.8, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_tls_ratio.png", plot = p3 , width = 1.8, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_tls_ratio.pdf", plot = p3 , width = 1.8, height = 1.25)
 
 p4 <- ggplot(df_long_number_vessel, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
   geom_violin(trim = FALSE, width = 0.5, linewidth = 0.1, fill = "white", color = "black") +
@@ -329,7 +329,7 @@ p4 <- ggplot(df_long_number_vessel, aes(x = Diagnosis, y = Value, color = Diagno
   facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels_num), strip.position = "bottom", ncol = 3) +
   labs(x = "", y = "Number") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
   theme_classic() +
   theme(
     panel.grid.minor = element_blank(),
@@ -349,8 +349,8 @@ p4 <- ggplot(df_long_number_vessel, aes(x = Diagnosis, y = Value, color = Diagno
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
-ggsave("99_Fig/fig2/nonOA_OA_RA_vessel_num.png", plot = p4, width = 3, height = 1.25)
-ggsave("99_Fig/fig2/nonOA_OA_RA_vessel_num.pdf", plot = p4, width = 3, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_vessel_num.png", plot = p4, width = 3, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_vessel_num.pdf", plot = p4, width = 3, height = 1.25)
 
 p5 <- ggplot(df_long_ratio_vessel, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
   geom_violin(trim = FALSE, width = 0.5, linewidth = 0.1, fill = "white", color = "black") +
@@ -358,7 +358,7 @@ p5 <- ggplot(df_long_ratio_vessel, aes(x = Diagnosis, y = Value, color = Diagnos
   facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels_ratio), strip.position = "bottom", ncol = 3) +
   labs(x = "", y = "Number/Area") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "ACLR", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   theme_classic() +
   theme(
@@ -379,6 +379,6 @@ p5 <- ggplot(df_long_ratio_vessel, aes(x = Diagnosis, y = Value, color = Diagnos
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
-ggsave("99_Fig/fig2/nonOA_OA_RA_vessel_ratio.png", plot = p5, width = 3, height = 1.25)
-ggsave("99_Fig/fig2/nonOA_OA_RA_vessel_ratio.pdf", plot = p5, width = 3, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_vessel_ratio.png", plot = p5, width = 3, height = 1.25)
+ggsave("99_Fig/sup_fig3/nonOA_OA_RA_vessel_ratio.pdf", plot = p5, width = 3, height = 1.25)
 

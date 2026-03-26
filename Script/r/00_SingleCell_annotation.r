@@ -1921,8 +1921,8 @@ p_class2_v2 <- DimPlot(sc_nonDoublet, cols = cluster_colors, group.by = "CellTyp
   guides(colour = guide_legend(
     override.aes = list(size = 1)
   ))
-ggsave("99_Fig/sup_fig6/Dim_Class2.png", plot = p_class2_v2, height = 1.5, width = 2.5)
-ggsave("99_Fig/sup_fig6/Dim_Class2.pdf", plot = p_class2_v2, height = 1.5, width = 2.5)
+ggsave("99_Fig/sup_fig9/Dim_Class2.png", plot = p_class2_v2, height = 1.5, width = 2.5)
+ggsave("99_Fig/sup_fig9/Dim_Class2.pdf", plot = p_class2_v2, height = 1.5, width = 2.5)
 
 meta <- sc_nonDoublet@meta.data
 df_stacked_bar_class1 <- meta %>% 
@@ -2030,8 +2030,8 @@ p_stacked_bar_class2_v2 <- ggplot(df_stacked_bar_class2, aes(x = orig.ident, y =
     legend.box.margin = margin(t = 0, r = 0, b = -7.5, l = -4, unit = "mm"),
     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
   )
-ggsave("99_Fig/sup_fig6/Stacked_Class2.png", p_stacked_bar_class2_v2, height = 1.5, width = 2.8)
-ggsave("99_Fig/sup_fig6/Stacked_Class2.pdf", p_stacked_bar_class2_v2, height = 1.5, width = 2.8)
+ggsave("99_Fig/sup_fig9/Stacked_Class2.png", p_stacked_bar_class2_v2, height = 1.5, width = 2.8)
+ggsave("99_Fig/sup_fig9/Stacked_Class2.pdf", p_stacked_bar_class2_v2, height = 1.5, width = 2.8)
 
 
 all.markers <- FindAllMarkers(sc_nonDoublet, assay = "SCT", only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5, recorrect_umi = FALSE)
@@ -2059,6 +2059,6 @@ p_Dot <- DotPlot(sc_nonDoublet, features = unique(all.markers_top5$gene), dot.sc
     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2, unit = "mm"),
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
   )
-ggsave("99_Fig/sup_fig6/Dot_DEG_Class2.png", p_Dot, height = 2, width = 8)
-ggsave("99_Fig/sup_fig6/Dot_DEG_Class2.pdf", p_Dot, height = 2, width = 8)
+ggsave("99_Fig/sup_fig9/Dot_DEG_Class2.png", p_Dot, height = 2, width = 8)
+ggsave("99_Fig/sup_fig9/Dot_DEG_Class2.pdf", p_Dot, height = 2, width = 8)
 
