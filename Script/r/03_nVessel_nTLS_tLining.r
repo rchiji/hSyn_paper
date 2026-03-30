@@ -255,7 +255,7 @@ p1 <- ggplot(df_long_lining, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
   labs(x = "Lining", y = "Mean thickness") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA")) +
   theme_classic() +
   theme(
     panel.border = element_blank(),
@@ -279,7 +279,7 @@ p2 <- ggplot(df_long_number_tls, aes(x = Diagnosis, y = Value, color = Diagnosis
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
   labs(x = "TLS", y = "Number") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA")) +
   theme_classic() +
   theme(
     panel.border = element_blank(),
@@ -303,7 +303,7 @@ p3 <- ggplot(df_long_ratio_tls, aes(x = Diagnosis, y = Value, color = Diagnosis)
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
   labs(x = "TLS", y = "Number/Area") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA")) +
   scale_y_continuous(limits = c(0, 3e-06)) +
   theme_classic() +
   theme(
@@ -329,7 +329,7 @@ p4 <- ggplot(df_long_number_vessel, aes(x = Diagnosis, y = Value, color = Diagno
   facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels_num), strip.position = "bottom", ncol = 3) +
   labs(x = "", y = "Number") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA")) +
   theme_classic() +
   theme(
     panel.grid.minor = element_blank(),
@@ -358,7 +358,7 @@ p5 <- ggplot(df_long_ratio_vessel, aes(x = Diagnosis, y = Value, color = Diagnos
   facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels_ratio), strip.position = "bottom", ncol = 3) +
   labs(x = "", y = "Number/Area") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA")) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   theme_classic() +
   theme(

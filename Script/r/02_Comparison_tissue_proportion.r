@@ -227,7 +227,7 @@ p <- ggplot(df_long, aes(x = Diagnosis, y = Value, color = Diagnosis)) +
   facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels), strip.position = "bottom", ncol = 6) +
   labs(y = "CLR(Proportion)") +
   scale_color_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e"),
-                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA")) +
+                     labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA")) +
   theme_classic() +
   theme(
     panel.border = element_blank(),

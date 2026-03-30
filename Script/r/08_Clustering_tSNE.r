@@ -28,7 +28,7 @@ plot_tsne <- ggplot(tsne_data, aes(x = tSNE1, y = tSNE2, color = cluster, shape 
   geom_point(size = 0.5) +
   scale_color_manual(values = c("1" = "#C2BAB4", "2" = "#FEC089", "3" = "#F06A00", "4" = "#8C2D04")) +
   scale_shape_manual(values = c("nonOA" = 16, "RA" = 15, "OA" = 17, "SLE" = 18, "SSc" = 18),
-                     labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
+                     labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
   labs(x = "tSNE1", y = "tSNE2", shape = "Diagnosis", color = "kmeans cluster") +
   theme_classic() +
   theme(
@@ -65,7 +65,7 @@ plot_stacked_bar <- ggplot(df_stacked_bar, aes(x = cluster, y = n, fill = Diagno
   labs(y = "Fraction of diagnosis type", fill = "Diagnosis") +
   scale_y_continuous(labels = function(x) x * 100) +
   scale_fill_manual(values = c("nonOA" = "#1f77b4", "RA" = "#2ca02c", "OA" = "#ff7f0e", "SLE" = "grey80", "SSc" = "grey80"),
-                    labels = c("nonOA" = "Trauma", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
+                    labels = c("nonOA" = "non-OA structural", "RA" = "RA", "OA" = "OA", "SLE" = "Other autoimmune diseases", "SSc" = "Other autoimmune diseases")) +
   theme_classic() +
   theme(
     plot.title = element_blank(),
