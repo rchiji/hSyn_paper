@@ -18,7 +18,6 @@ from shapely.geometry import Polygon
 from tqdm.auto import tqdm
 
 
-# 画像読み込み機能
 def read_region(slide,location,size):
     image = slide.read_region(location=location,
                               level=0,
@@ -37,35 +36,30 @@ def prepare_tile_coords(
     downsample_factor:int = 2
 ):
     """
-    WSIデータから予測用タイル画像の座標を取得する機能
+    Returns tile coordinates for inference from WSI data.
 
     Arguments:
     - slide
-        WSIのOpenSlideオブジェクト または WSIのファイルパス
+        OpenSlide object of the WSI or file path to the WSI
     - tile_size
-        機械学習に使用するタイル辺のピクセルサイズ
+        Pixel size of each tile edge used for machine learning
     - overlap
-        タイルの重複幅
+        Overlap width between adjacent tiles
     - downsample_factor
-        機械学習に使用する際のダウンサンプリング係数
-    
-    Return:
-     座標情報の辞書のリスト
+        Downsampling factor applied for machine learning
+
+    Returns:
+        List of dictionaries containing coordinate information
     """
 
-    # slide引数がファイルパスならOpenSlideオブジェクトを作成
     if isinstance(slide,str):
         slide = openslide.open_slide(slide)
 
-    # WSLデータのピクセルサイズを取得
     slide_width, slide_height = slide.dimensions
 
-    # 元の解像度の場合のピクセルサイズ
     tile_size_original = tile_size * downsample_factor
     overlap_original = overlap * downsample_factor
     
-    # タイルの開始座標を算出。縦方向、横方向それぞれで行う。
-    # 元のスライドサイズを超えるまでタイルの開始座標を記録していく。
     start_x=0; start_x_list=[0]
     while start_x + tile_size_original < slide_width:
         start_x = int(start_x  + tile_size_original - overlap_original)
@@ -76,7 +70,6 @@ def prepare_tile_coords(
         start_y = int(start_y  + tile_size_original - overlap_original)
         start_y_list.append(start_y)
 
-    # タイル開始座標を[x,y]の組み合わせたリストに。さらに全座標を一つのリストに。
     tile_coords = []
     for i in range(len(start_x_list)):
         for j in range(len(start_y_list)):
@@ -93,22 +86,17 @@ def prepare_tile_coords(
 def read_geojson(json_filepath):
     mime_type, mine_encoding = mimetypes.guess_type(url = json_filepath)
     if mime_type is not None and "zip" in mime_type:
-        # ZIPファイルをメモリに読み込む
         with open(json_filepath, "rb") as zip_file:
             zip_data = io.BytesIO(zip_file.read())
         
-        # ZIPファイルを解凍せずにJSONデータを直接読み込む
         with zipfile.ZipFile(zip_data, "r") as zip_ref:
-            # ZIPファイル内のJSONファイル名
             json_file_name = zip_ref.namelist()[0]
             
             with zip_ref.open(json_file_name) as json_file:
-                # JSONファイルを読み込む
                 roi_data = json.load(json_file)
                 
     elif "gzip" == mine_encoding:
         with gzip.open(json_filepath, 'rt') as f:
-            # JSONデータを読み込む
             roi_data = json.load(f)
     else:
         with open(json_filepath, 'r') as json_file:
@@ -122,9 +110,7 @@ def get_ROIList(roi_data):
         roi_data = roi_data["features"]
         
     ROI_list = []
-    ## ROIの数だけ繰り返し処理。
     for i in range(len(roi_data)):
-        # 座標情報を取り出す
         coord = roi_data[i]["geometry"]["coordinates"][0]
         ROI_list.append(coord)
 
@@ -137,17 +123,14 @@ def check_overlap(
     Threshold = 0,
 ):
     """
-    Tile内にROIが含まれるか判断する機能
-    
+    Determines whether a tile sufficiently overlaps with the region(s) of interest (ROI).
     Arguments:
-     - ROI: ROIのsharpyオブジェクト。複数の場合はリストで渡す。
-     - Tile: Tileのsharpyオブジェクト
-     - Threshold: Tile中のROIの割合の閾値。0-1の間で指定。
-
-    Return:
-     予測タイル座標が予測対象エリアに閾値以上の面積割合で跨るかどうかのbool値
+     - ROI: Shapely object representing the ROI. If multiple, provide as a list.
+     - Tile: Shapely object representing the tile
+     - Threshold: Minimum area ratio of ROI within the tile (between 0 and 1)
+    Returns:
+     Boolean indicating whether the tile overlaps the target region with an area ratio above the threshold
     """
-    # ROI引数の指定がROIのリストの場合
     if isinstance(ROI, list):
         checklist = []
         for roi in ROI:
@@ -169,35 +152,30 @@ def extract_Tiles(
     tile_coords:list,
     tile_size=512,
     downsample_factor=2,
-    Threshold=0, # タイル中のROI割合閾値
+    Threshold=0,
 ):
     """
-    QuPathのAnnotation Objectの座標情報（geojson）を使って、ROIを含むタイルだけを抽出する機能。
-
+    Extracts only the tiles that contain ROI regions using coordinate information from QuPath Annotation Objects (GeoJSON).
     Arguments:
     - json_filepath
-        QuPathから書き出したgeojsonファイルのパス
+        Path to the GeoJSON file exported from QuPath
     - tile_coords
-        タイル画像の座標リスト。get_tile_coords機能の出力。
+        List of tile coordinates. Output of the get_tile_coords function.
     - tile_size
-        機械学習に使用するタイル辺のピクセルサイズ
+        Pixel size of each tile edge used for machine learning
     - downsample_factor
-        機械学習に使用する際のダウンサンプリング係数
+        Downsampling factor applied for machine learning
     - Threshold
-        Tile中のROIの割合の閾値。0-1の間で指定。
+        Minimum area ratio of ROI within the tile (between 0 and 1)
     """
 
-    # ダウンサンプリング前のWSI座標でのタイルサイズ
     tile_size_original = tile_size * downsample_factor
 
-    # geojsonファイルからsharpy Polygonオブジェクトを作成
     roi_data = read_geojson(json_filepath=json_filepath)
     ROI_list = get_ROIList(roi_data)
     ROI_list = [Polygon(coord) for coord in ROI_list]
 
-    # 最終的なタイル座標の保存先リスト
     final_tile_coords = []
-    # 各タイル座標のPolygonオブジェクトがQuPath ROIを含むかどうか確認
     for tile_coord in tqdm(tile_coords):
         x, y = tile_coord["x"], tile_coord["y"]
         x_end = x + tile_coord["w"]; y_end = y + tile_coord["h"]

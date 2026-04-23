@@ -27,20 +27,15 @@ def prepare_image_paths(
 def estimate_extension(
     image_dir
 ):
-    # 拡張子のリストを取得
     extensions = [os.path.splitext(file)[1] for file in os.listdir(image_dir)]
-    # 最頻の拡張子を取得
     most_common_extension = Counter(extensions).most_common(1)[0][0]
     return most_common_extension
 
 
 def pad_image(image, tile_size):
-    # 縦横の不足ピクセル数
     diff_h = tile_size - tf.shape(image)[0]
     diff_w = tile_size - tf.shape(image)[1]
-    # 埋めるピクセル数
     padding = [[0, diff_h], [0, diff_w], [0, 0]]
-    # 0埋めの実行
     new_image = tf.pad(tensor=image, paddings=padding, mode="CONSTANT", constant_values=0)
     return new_image  
 
@@ -48,7 +43,6 @@ def pad_image(image, tile_size):
 def read_image(file_path, tile_size, mask=False):
     image = tf.io.read_file(file_path)
     image = tf.image.decode_png(image, channels=1) if mask is True else tf.image.decode_png(image, channels=3)
-    # 画像サイズがtile_sizeに満たない場合はpadding
     if (tf.shape(image)[0] < tile_size or tf.shape(image)[1] < tile_size):
         image = pad_image(image,tile_size)
     return image
@@ -61,17 +55,13 @@ def load_data(image_path, label_path, tile_size):
 
 
 def shape_augment(image, label):
-    # 明視野画像とラベル画像を重ねておく
     combine = tf.concat(values=[image,label],axis=-1)
-    # データ拡張内容を定義
     augment_layer = tf.keras.Sequential([
         tf.keras.layers.RandomFlip(mode="horizontal_and_vertical"),
         tf.keras.layers.RandomRotation(factor=0.2, fill_mode="constant", interpolation="nearest"),
         tf.keras.layers.RandomTranslation(height_factor=(-0.2,0.2),width_factor=(-0.2,0.2), fill_mode="constant", interpolation="nearest")
     ])
-    # データ拡張を実行
     combine = augment_layer(combine)
-    # 明視野画像、ラベル画像を返す
     image = tf.cast(combine[...,0:3], dtype=tf.uint8)
     label = tf.cast(combine[...,3], dtype=tf.uint8)
     label = tf.expand_dims(label, axis=-1)
@@ -112,24 +102,19 @@ def GenerateDataset(
     num_classes:int=None
     ):
     
-    # 画像のDataset作成
     dataset = tf.data.Dataset.from_tensor_slices(tensors=(image_paths, label_paths)) \
         .map(map_func= lambda image_path, label_path: load_data(image_path,label_path,tile_size), 
              num_parallel_calls=tf.data.AUTOTUNE)
     
-    # データ拡張
     if data_augment and training:
         dataset = dataset.map(map_func=shape_augment, num_parallel_calls=tf.data.AUTOTUNE)
 
-    # 1次元の軸を削除
     dataset = dataset.map(map_func= lambda Image, Label: (Image, squeeze_label(Label)),
                           num_parallel_calls=tf.data.AUTOTUNE)  
-    # One-hot encoding
     if one_hot:
         dataset = dataset.map(map_func= lambda Image, Label: (Image, onehot_label(Label, num_classes)),
         num_parallel_calls=tf.data.AUTOTUNE)
 
-    # データ型、値の範囲の変更
     dataset = dataset.map(map_func= lambda Image, Label: cast_dtype(Image,Label,label_dtype),
                           num_parallel_calls=tf.data.AUTOTUNE) \
                      .map(map_func= lambda Image, Label: (rescale_image(Image, centering), Label),
@@ -149,15 +134,14 @@ def GenerateDataset(
 
 def CheckDataset(dataset, num:int=10):
     import math
-    nrows = math.ceil( num/ 5 ) * 2 # plotの行数設定
+    nrows = math.ceil( num/ 5 ) * 2
     ncols = min(num, 5)
     fig, axs = plt.subplots(ncols=ncols, nrows=nrows)
     i = 0
     mini_dataset = dataset.take(num)
     
-    ## One hotかどうか判定
     _,la = next(iter(dataset))
-    is_onehot = tf.reduce_all( # 全ての要素が0か1かを判定
+    is_onehot = tf.reduce_all(
         tf.logical_or(tf.equal(la, 0), tf.equal(la, 1))
     )
     
@@ -165,13 +149,10 @@ def CheckDataset(dataset, num:int=10):
         row = i // 5*2
         col = i % 5
         
-        # 明視野画像
         axs[row,col].imshow(tf.keras.preprocessing.image.array_to_img(images[0]))
         axs[row,col].grid(False); axs[row,col].set_xticks([]); axs[row,col].set_yticks([])
         
-        # ラベル画像
         label = labels[0]
-        # one-hotの場合は、argmax
         if is_onehot:
             label = tf.argmax(label,axis=-1)
         axs[row+1,col].imshow(label)
@@ -190,22 +171,25 @@ def PrepareTrainValPath(image_dir="Images",
                         image_paths=None,
                         label_paths=None,
                         seed=None):
-    """Train, Val画像のパスを取得する関数
+    """Function to prepare file paths for training and validation datasets.
     
     Args:
-        image_dir (str): 明視野画像が入っているフォルダのパス
-        label_dir (str): ラベル画像が入っているフォルダのパス
-        train_ratio (float): 学習画像の割合
-        image_extension (str): 明視野画像の拡張子
-        label_extension (str): ラベル画像の拡張子
-        image_paths (list): 明視野画像のパス一覧
-        label_paths (list): ラベル画像のパス一覧
-        seed (int): ランダムシード
+        image_dir (str): Directory containing brightfield (WSI) images.
+        label_dir (str): Directory containing corresponding label (mask) images.
+        train_ratio (float): Proportion of data used for training.
+        image_extension (str): File extension for input images.
+        label_extension (str): File extension for label images.
+        image_paths (list): Optional list of image file paths.
+        label_paths (list): Optional list of label file paths.
+        seed (int): Random seed for reproducibility.
 
     Returns:
-        tuple: 訓練明視野画像のパス、訓練マスク画像のパス、検証明視野パス、検証マスク画像パスの4つ
+        tuple: Four lists consisting of:
+            - training image paths,
+            - training label (mask) paths,
+            - validation image paths,
+            - validation label (mask) paths.
     """
-    ## path一覧の指定が無ければimage_dir, label_dirからパス一覧を取得
     if image_paths is None:
         ipaths = prepare_image_paths(image_dir, image_extension)
     else:
@@ -216,17 +200,14 @@ def PrepareTrainValPath(image_dir="Images",
     else:
         lpaths = sorted(label_paths)
     
-    # index操作のためにnumpyに変換
     ipaths = np.array(ipaths)
     lpaths = np.array(lpaths)
     
-    # ランダムにindexを取り出す
     if seed is not None:
         random.seed(seed)
     train_ratio = int(len(ipaths)*train_ratio)
     train_idx = random.sample(range(len(ipaths)), train_ratio)
     
-    # indexを使って、ファイルパスを分割
     train_ipaths = ipaths[train_idx]
     train_lpaths = lpaths[train_idx]
     val_ipaths = np.delete(ipaths, train_idx)
@@ -275,7 +256,7 @@ def GenerateDatasets(
 
 def read_pred_image(path):
     """
-    ファイルパスから明視野画像を読み込んでtf.float32型で返す
+    Reads a brightfield image from the given file path and returns it as a tf.float32 tensor.
     """
     image = tf.io.read_file(path)
     image = tf.image.decode_png(image, channels=3)
@@ -291,16 +272,14 @@ def GeneratePredictDataset(
     centering:bool=True,
     ):
     """
-    予測時に使用する明視野画像のdatasetを返す機能
+    Generates a dataset of brightfield images for inference.
     """
 
-    # 画像パスリストの用意が無ければフォルダからパス作成
     if image_paths is None:
         image_paths = prepare_image_paths(image_dir,extension)
     
     image_paths = sorted(image_paths)
     
-    # 明視野画像のDataset作成
     dataset = tf.data.Dataset.from_tensor_slices(tensors=image_paths) \
         .map(lambda path : (read_pred_image(path), path), num_parallel_calls=tf.data.AUTOTUNE) \
         .map(lambda image, path : (pad_image(image, tile_size), path), 
@@ -320,10 +299,8 @@ def GeneratePredictDataset_labelholder(
     centering:bool=True,
     ):
 
-    # labelholdersから画像ファイルパスのリスト作成
     image_paths = [ lh.path for lh in labelholders]
     
-    # 明視野画像のDataset作成
     dataset = tf.data.Dataset.from_tensor_slices(tensors=image_paths) \
         .map(read_pred_image, num_parallel_calls=tf.data.AUTOTUNE) \
         .map(lambda image : pad_image(image, tile_size), 

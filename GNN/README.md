@@ -1,36 +1,46 @@
-# 📦 プロジェクト構成とデータ配置
+# Project Structure and Data Organization
 ```
 GNN/
-├── environment.yml                                  # conda仮想環境ファイル
-├── README.md                                        # 本ファイル
-├── model_weights/                                   # 学習済みモデル
+├── environment.yml                                          # Conda environment file
+├── README.md                                                # Project documentation
+├── 2401118_SLICTile_GNN.ipynb                               # Training record notebook
+├── model_weights/                                           # Trained model weights
 │   └── CancerCell_model_20um_5hop3sample64feat_241118.pt
-└── qupath/                                          # WSI予測ラベル画像を扱うためのQuPathプロジェクト
-|                                                    # label_ometiff_model7_241113をimportしたもの                    
 |
-├── data/
-│   ├── labelRatio/                           # SLICタイルごとのラベル比率ファイル（118個） <-- need download
-│   │   ├── D001_HE.txt
-│   │   ├── ...
-│   │   └── D130_HE.txt
-
-│   └── GNN_InOut.h5                                 # 訓練済み特徴量 + ラベル情報（HDF5形式） <-- need download
+├── qupath/                                                  # QuPath project for processing WSI prediction label images (imported from label_ometiff_model7_241113)
+|   └── scripts/                                             # Scripts for generating SLIC superpixels and mapping GNN features back to QuPath
+|
+└── data/
+    ├── labelRatio_241117/                                   # Label composition per SLIC tile (download required)
+    |   ├── D001_HE.txt
+    |   ├── ...
+    |   └── D130_HE.txt
+    |
+    ├── SLICTile_Features_241125/                            # GNN-derived features per SLIC tile (download required)
+    │   ├── D001.txt
+    │   ├── ...
+    │   └── D130.txt
+    │
+    └── GNN_InOut.h5                                         # GNN input/output data (labels + features, HDF5 format, download required)
 
 ```
 
-# 📦 ダウンロードリンク一覧
+# Data Availability
+The datasets used in this study — including label composition within SLIC tiles, 64-dimensional SLIC tile features, and GNN-derived input/output data (labels + features in HDF5 format) — are available via Zenodo:
+https://zenodo.org/communities/human-synovial-histology
 
-- **推論結果データ**  
-  - [label_ometiff_model7_241113](https://drive.google.com/drive/folders/19FzmIiERxySgiVUBLJM1ePCDAJIFRlu1?usp=drive_link)  
+### Contents
+- **Label composition files (per SLIC tile, 118 files)**  
+ -> *SLIC tile label composition features for human synovial histology 01-02* 
 
-- **ラベル比率ファイル（SLIC tile単位, 118 files）**  
-  [labelRatio フォルダ](https://drive.google.com/drive/folders/1G-Y3E7iS7MdGGhgSz1ogzkP2WI6Z1wm0?usp=drive_link)
+- **GNN-derived features (per SLIC tile, 118 files)**  
+ -> *Graph neural network–derived SLIC tile features for human synovial histology 01-02*
 
-- **訓練済み特徴量（ラベル＋特徴量, HDF5形式）**  
-  [GNN_InOut.h5](https://drive.google.com/file/d/1riQMyqboWnH4b2S0tbYj88Ww5YaTtco9/view?usp=drive_link)
+- **GNN input/output data (labels + features, HDF5 format)**  
+ -> *Graph neural network input and output data for human synovial histology analysis*
 
 
-# 📦 仮想環境の再現
+# Environment Setup
 ```
 conda env create -f environment.yml
 conda activate GNN

@@ -8,14 +8,11 @@ from datasets import prepare_image_paths
 
 
 def preprocess(y_true,y_pred):
-    # 分類class数を自動判定
     num_classes = tf.shape(y_pred)[-1]
 
-    # SoftmaxされていなければSoftmax
     if not tf.round(tf.reduce_mean(tf.reduce_sum(y_pred[0],axis=-1))*10)/10 == 1.0:
         y_pred = tf.nn.softmax(y_pred, axis=-1)
     
-    # 正解ラベルをone hot encoding
     if len(tf.shape(y_true)) == 3:
         y_true = tf.one_hot(tf.cast(y_true, dtype=tf.uint8), depth=num_classes)
 
@@ -25,14 +22,11 @@ def preprocess(y_true,y_pred):
 def dice_loss(y_true, y_pred):
     smooth=1e-7
     
-    # 正解ラベル、予測ラベルの前処理
     y_true,y_pred = preprocess(y_true,y_pred)
 
-    # [Batch*Y*X, num_classes]の形状に
     y_true = tf.reshape(y_true, [-1,tf.shape(y_true)[-1]])
     y_pred = tf.reshape(y_pred, [-1,tf.shape(y_pred)[-1]])
 
-    # diceの分子、分母を計算 [Batch*Y*X, num_classes] -> [num_classes]
     intersect = tf.reduce_sum(y_true*y_pred, axis=0)
     denom = tf.reduce_sum(y_true+y_pred, axis=0)
 
@@ -44,14 +38,11 @@ def dice_loss(y_true, y_pred):
 def jaccard_loss(y_true, y_pred):
     smooth = 1e-7
     
-    # 正解ラベル、予測ラベルの前処理
     y_true,y_pred = preprocess(y_true,y_pred)
 
-    # [Batch*Y*X, num_classes]の形状に
     y_true = tf.reshape(y_true, [-1,tf.shape(y_true)[-1]])
     y_pred = tf.reshape(y_pred, [-1,tf.shape(y_pred)[-1]])
     
-    # jaccardの分子、分母を計算 [Batch*Y*X, num_classes] -> [num_classes]
     intersect = tf.reduce_sum(y_true * y_pred, axis=0)
     union = tf.reduce_sum(y_true + y_pred - (y_true * y_pred), axis=0) 
     jaccard = (intersect + smooth) / (union + smooth)
@@ -72,15 +63,12 @@ class DiceLoss(tf.keras.losses.Loss):
         self.class_weight = class_weight
 
     def call(self, y_true, y_pred):
-        # 正解ラベル、予測ラベルの前処理
         y_true,y_pred = preprocess(y_true,y_pred)
     
-        # 形状変化。class_average=Trueなら[Batch*Y*X, num_classes], Falseなら[Batch*Y*X*num_classes]
         shape = [-1,tf.shape(y_true)[-1]] if self.class_average is True else [-1]
         y_true_f = tf.reshape(y_true, shape)
         y_pred_f = tf.reshape(y_pred, shape)
     
-        # diceの分子、分母を計算
         intersect = tf.reduce_sum(y_true_f * y_pred_f, axis=0)
         denom = tf.reduce_sum(y_true_f + y_pred_f, axis=0)
     
@@ -104,15 +92,12 @@ class JaccardLoss(tf.keras.losses.Loss):
         self.smooth = smooth
 
     def call(self, y_true, y_pred):
-        # 正解ラベル、予測ラベルの前処理
         y_true,y_pred = preprocess(y_true,y_pred)
     
-        # 形状変化。class_average=Trueなら[Batch*Y*X, num_classes], Falseなら[Batch*Y*X*num_classes]
         shape = [-1,tf.shape(y_true)[-1]] if self.class_average is True else [-1]
         y_true_f = tf.reshape(y_true, shape)
         y_pred_f = tf.reshape(y_pred, shape)
 
-        # jaccardの分子、分母を計算
         intersect = tf.reduce_sum(y_true_f * y_pred_f, axis=0)
         union = tf.reduce_sum(y_true_f + y_pred_f - (y_true_f * y_pred_f), axis=0)
         jaccard = (intersect + self.smooth) / (union + self.smooth)  
@@ -125,16 +110,12 @@ def CalcLossWeight(
     num_classes:int,
     log_base=None
 ):
-    # ラベル画像のファイルパスリスト作成
     label_paths = prepare_image_paths(label_dir)
 
-    # ラベル画像を読み込んで各ラベル輝度のピクセル数を集計
     index_counts = []
     for path in tqdm(label_paths):
-        # ラベル画像読み込み
         label = tf.io.read_file(path)
         label = tf.image.decode_png(label, channels=1)
-        # ラベル輝度ごとに集計
         index_count = []
         for i in range(num_classes):
             index_count.append(np.count_nonzero(label == i))

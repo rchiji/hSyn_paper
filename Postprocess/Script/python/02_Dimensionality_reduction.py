@@ -30,7 +30,7 @@ donor_knee = (
 )
 
 dfs = []
-for f in glob("../GNN/SLICTile_Features_241125/*.txt"):
+for f in glob("../GNN/data/SLICTile_Features_241125/*.txt"):
     donor = os.path.splitext(os.path.basename(f))[0]
     df = pl.read_csv(f, separator="\t")
     df = df.with_columns(pl.col("ID").cast(str))

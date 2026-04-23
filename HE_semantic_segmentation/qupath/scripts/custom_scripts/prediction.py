@@ -19,10 +19,8 @@ def predictDataset_labelholder(
     labelholders = []
     
     for images, paths in tqdm(dataset):
-        # バッチサイズで予測処理
         labels = model.predict_on_batch(images)
         
-        # ImageHolder作成
         for path, label in zip(paths, labels):
             labelholder = LabelHolder(path.numpy().decode())
             labelholder.label = label
@@ -39,17 +37,13 @@ def aveprob_labelholder(
 ):
     for labelholder in labelholders:
         if labelholder.label_final is None:
-            # 周囲の画像の予測マスクが作られてるかチェック
             if checkSurround(labelholder, labelholders, gap) is True:
-                # 準備できていれば確率マップの平均化を実行
                 calcAveProb(labelholder, labelholders, tile_size,
                             overlap, gap, num_classes)
                 
-    # 画像が9回呼ばれたimageholderの予測マスク情報を削除
     for lh in labelholders:
         lh.check_call_count()
 
-# labelをlabelholderに登録する機能
 def registerLabel(
     path,
     label,
@@ -64,11 +58,9 @@ def registerLabel(
 def orderLabelHolders(
     labelholders
 ):
-    # 全てのx座標およびy座標を取得
     x_list = sorted(set([ lh.tile_info["x"] for lh in labelholders]))
     y_list = sorted(set([ lh.tile_info["y"] for lh in labelholders]))
 
-    # 3つの座標を一組にする
     x_sets = [x_list[i:i+3] for i in range(0, len(x_list), 3)]
     y_sets = [y_list[i:i+3] for i in range(0, len(y_list), 3)]
 
@@ -89,11 +81,9 @@ def orderImagePath(
     image_paths
 ):
     coord_dict = { p: getTileCoord(p) for p in image_paths}
-    # 全てのx座標およびy座標を取得
     x_list = sorted(set([ tile_info["x"] for tile_info in coord_dict.values() ]))
     y_list = sorted(set([ tile_info["y"] for tile_info in coord_dict.values() ]))
 
-    # 3つの座標を一組にする
     x_sets = [x_list[i:i+3] for i in range(0, len(x_list), 3)]
     y_sets = [y_list[i:i+3] for i in range(0, len(y_list), 3)]
 

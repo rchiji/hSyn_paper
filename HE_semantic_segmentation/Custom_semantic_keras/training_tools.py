@@ -1,6 +1,3 @@
-## 221221 label画像を表示させる際、元のcolormapに変換して表示できるように。
-## 240414 GenerateDataset関数 -> 明視野画像がtileSize以下の場合に、paddingされるように変更
-
 import os
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 import re
@@ -22,16 +19,16 @@ def PrepareTrainValPath(images_dir="Images",
                         images_path=None,
                         masks_path=None,
                         seed=1):
-    """""""""""""""""""""""
-    Train, Val画像のパスを取得
-    ・明視野画像のパス一覧、マスク画像のパス一覧をimages_path, masks_path引数に指定するか、
-    明視野画像が入っているフォルダへのパス、マスク画像が入っているフォルダへのパスをimages_dir、mask_dir引数に指定
-    ・訓練画像の割合をtrain_ratio引数で指定。残りがval画像になる。
-    ・画像パスからランダムに取り出すので再現性が必要であればseed引数に任意の値を入れる。
-    ・明視野画像の拡張子をimage_extension引数に指定
-    ・返り値は訓練明視野画像のパス、訓練マスク画像のパス、検証明視野パス、検証マスク画像パスの4つ
-    """""""""""""""""""""""
-    ## path一覧の指定が無ければimages_dir, masks_dirからパス一覧を取得
+    """
+    Retrieves file paths for training and validation images.
+    - Specify either lists of brightfield image paths and mask image paths via images_path and masks_path,
+      or directories containing them via images_dir and masks_dir.
+    - The proportion of training data is set with train_ratio; the remainder is used for validation.
+    - Paths are randomly sampled, so specify a seed value if reproducibility is required.
+    - Specify the file extension of brightfield images with image_extension.
+    - Returns four lists: training image paths, training mask paths,
+      validation image paths, and validation mask paths.
+    """
     if images_path is None:
         ipaths = sorted(glob(f"{images_dir}/*{image_extension}"))
     else:
@@ -42,16 +39,13 @@ def PrepareTrainValPath(images_dir="Images",
     else:
         mpaths = sorted(masks_path)
     
-    # index操作のためにnumpyに変換
     ipaths = np.array(ipaths)
     mpaths = np.array(mpaths)
     
-    # ランダムにindexを取り出す
     random.seed(seed)
     train_ratio = int(len(ipaths)*train_ratio)
     train_idx = random.sample(range(len(ipaths)), train_ratio)
     
-    # indexを使って、ファイルパスを分割
     train_ipaths = ipaths[train_idx]
     train_mpaths = mpaths[train_idx]
     val_ipaths = np.delete(ipaths, train_idx)
@@ -68,15 +62,17 @@ def GenerateDataset(
     image_size:int,           
     center_zero:bool=True,
     data_augment:bool=True):
-    """""""""""""""""""""""
-    画像生成器を定義してtf用datasetを作るところまで
-    ・image_paths, mask_pathsに明視野パス一覧、マスク画像パス一覧を加える。
-    ・データ拡張には上下左右反転、回転、平行移動がある。
-     訓練dataset作成時にはdata_augment=Trueにし、検証dataset作成時にはdata_augment=Falseにすると良い。
-    ・image_sizeにinput画像のpx数を指定
-    ・batch_sizeにミニバッチ学習時の１バッチにおける画像数を指定
-    ・center_zero: trueなら0-255を-1~1の値に、falseなら0~1の値に変換。
-    """""""""""""""""""""""
+    """
+    Defines an image generator and creates a TensorFlow dataset.
+    - Provide lists of brightfield image paths and mask image paths via image_paths and mask_paths.
+    - Data augmentation includes horizontal and vertical flipping, rotation, and translation.
+      It is recommended to set data_augment=True when creating the training dataset
+      and data_augment=False when creating the validation dataset.
+    - Specify the input image size in pixels with image_size.
+    - Specify the number of images per mini-batch with batch_size.
+    - center_zero: if True, converts pixel values from 0–255 to -1 to 1;
+      if False, converts them to 0 to 1.
+    """
     def read_image(image_path, image_size=image_size, mask=False, center_zero=True):
         image = tf.io.read_file(image_path)
         if mask:
@@ -105,22 +101,17 @@ def GenerateDataset(
     
     def augment_using_layers(image, mask):
         def aug():
-            # keras.layersシリーズのデータ拡張を設定
             flip = tf.keras.layers.RandomFlip(mode="horizontal_and_vertical")
             rota = tf.keras.layers.RandomRotation(0.2, fill_mode='constant')
             trans = tf.keras.layers.RandomTranslation(height_factor=(-0.2, 0.2),
                                                 width_factor=(-0.2, 0.2), 
                                                 fill_mode='constant')        
-            # いったんリストにまとめたものをkeras.Sequentialに入れる。
             layers = [flip, trans, rota]
             aug_model = tf.keras.Sequential(layers)
-            return aug_model # <-- keras modelを返す
-        aug = aug() # <-- keras modelとして取り出す。
-        # 3 chの画像と1 chのマスクを最終軸で重ねる。
+            return aug_model
+        aug = aug()
         image_mask = tf.concat([image, mask], -1)  
-        # データ拡張を実施
-        image_mask = aug(image_mask)  # <-- model sequentialを通す。
-        # 0-2 chを取り出してimage, 3 chを取り出してmaskとする。
+        image_mask = aug(image_mask)
         image = image_mask[:,:,0:3]
         mask = image_mask[:,:,3]
         return image, tf.cast(mask, 'uint8')
@@ -137,8 +128,6 @@ def GenerateDataset(
     
     return dataset
 
-## datasetを高速化
-# https://zenn.dev/tokyoyoshida/articles/5c3270ce0d4c91#%E7%94%BB%E5%83%8F%E3%82%92%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%82%93%E3%81%A7%E8%A1%A8%E7%A4%BA%E3%81%99%E3%82%8B
 def GenerateDataset2(
     image_paths:list[str],
     mask_paths:list[str],
@@ -146,15 +135,17 @@ def GenerateDataset2(
     image_size:int,           
     center_zero:bool=True,
     data_augment:bool=True):
-    """""""""""""""""""""""
-    画像生成器を定義してtf用datasetを作るところまで
-    ・image_paths, mask_pathsに明視野パス一覧、マスク画像パス一覧を加える。
-    ・データ拡張には上下左右反転、回転、平行移動がある。
-     訓練dataset作成時にはdata_augment=Trueにし、検証dataset作成時にはdata_augment=Falseにすると良い。
-    ・image_sizeにinput画像のpx数を指定
-    ・batch_sizeにミニバッチ学習時の１バッチにおける画像数を指定
-    ・center_zero: trueなら0-255を-1~1の値に、falseなら0~1の値に変換。
-    """""""""""""""""""""""
+    """
+    Defines an image generator and creates a TensorFlow dataset.
+    - Provide lists of brightfield image paths and mask image paths via image_paths and mask_paths.
+    - Data augmentation includes horizontal and vertical flipping, rotation, and translation.
+      It is recommended to set data_augment=True when creating the training dataset
+      and data_augment=False when creating the validation dataset.
+    - Specify the input image size in pixels with image_size.
+    - Specify the number of images per mini-batch with batch_size.
+    - center_zero: if True, converts pixel values from 0–255 to -1 to 1;
+      if False, converts them to 0 to 1.
+    """
     def read_image(image_path, image_size=image_size, mask=False, center_zero=True):
         image = tf.io.read_file(image_path)
         if mask:
@@ -183,22 +174,17 @@ def GenerateDataset2(
     
     def augment_using_layers(image, mask):
         def aug():
-            # keras.layersシリーズのデータ拡張を設定
             flip = tf.keras.layers.RandomFlip(mode="horizontal_and_vertical")
             rota = tf.keras.layers.RandomRotation(0.2, fill_mode='constant')
             trans = tf.keras.layers.RandomTranslation(height_factor=(-0.2, 0.2),
                                                 width_factor=(-0.2, 0.2), 
                                                 fill_mode='constant')        
-            # いったんリストにまとめたものをkeras.Sequentialに入れる。
             layers = [flip, trans, rota]
             aug_model = tf.keras.Sequential(layers)
-            return aug_model # <-- keras modelを返す
-        aug = aug() # <-- keras modelとして取り出す。
-        # 3 chの画像と1 chのマスクを最終軸で重ねる。
+            return aug_model
+        aug = aug()
         image_mask = tf.concat([image, mask], -1)  
-        # データ拡張を実施
-        image_mask = aug(image_mask)  # <-- model sequentialを通す。
-        # 0-2 chを取り出してimage, 3 chを取り出してmaskとする。
+        image_mask = aug(image_mask)
         image = image_mask[:,:,0:3]
         mask = image_mask[:,:,3]
         return image, tf.cast(mask, 'uint8')
@@ -206,7 +192,6 @@ def GenerateDataset2(
     num_imgs = len(image_paths)
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, mask_paths))
     dataset = dataset.map(load_data, num_parallel_calls=tf.data.AUTOTUNE)
-    # ここでローカルにcacheしてみる。一応データ拡張前が良いかなと思って。
     dataset = dataset.cache(filename = "./cache.tf-data")
     if data_augment is True:
         dataset = dataset.map(lambda x, y: augment_using_layers(x, y), num_parallel_calls=tf.data.AUTOTUNE)
@@ -218,10 +203,10 @@ def GenerateDataset2(
     return dataset
 
 """
-label_indexをRGBのカラー画像に戻す。
-colormapはpreparing_tools.MakeColorMapで作成したnpyファイルを想定。
-QuPathのアノテーションとして再インポートするためには、8-bit colorのPNGが必要
-pallet_mode=TrueでPillowのpalleteモードに変換
+Converts label indices back to an RGB color image.
+The colormap is assumed to be an .npy file generated by preparing_tools.MakeColorMap.
+To re-import the image as QuPath annotations, an 8-bit color PNG is required.
+If palette_mode=True, the image is converted to Pillow palette mode.
 """
 def LabelToColorMask(label_img=None,
                      colormap:str=None,
@@ -230,24 +215,19 @@ def LabelToColorMask(label_img=None,
                      pallete_mode:bool=True
                      ):
     
-    # 画像ファイルの指定が無ければ、画像パスから読み込む
     if label_img is None:
         label_img = Image.open(label_img_path)
         label_img = np.asarray(label_img)
     
-    # imgと同じサイズのゼロ行列を用意。ch数は3。
     rgb = np.zeros(shape=(label_img.shape[0],label_img.shape[1],3), dtype="uint8")
     
-    # colormapの指定が無ければcolormap_pathから読み込む
     if colormap is None:
         colormap = np.load(colormap_path)
     
     num_classes = len(colormap)
-    # 各label index値のところに対応するRGB値を入れていく
     for i in range(num_classes):
         rgb[label_img==i] = colormap[i]
     
-    # pallete_mode引数がtrueならrgbを8-bit colorに変換する。
     if pallete_mode is True:
         rgb = Image.fromarray(rgb)
         rgb = rgb.convert(mode="P", matrix=None, dither=0, colors=256, palette=0)
@@ -256,16 +236,16 @@ def LabelToColorMask(label_img=None,
     return rgb
 
 def CheckDataset(dataset, figsize:int=20, colormap_path:str=None):
-    """""""""""""""""""""""
-    datasetから一部を表示してデータ拡張などを確認
-    ・作成したdatasetを指定すると10回分のバッチを取り出して、その1枚目の画像を表示する。
-    ・データ拡張が十分か確認できる。
-    """""""""""""""""""""""
+    """
+    Displays samples from the dataset to verify data augmentation.
+    - Given a dataset, retrieves 10 batches and displays the first image from each batch.
+    - Useful for checking whether data augmentation is functioning as expected.
+    """
     plt.figure(figsize=(figsize,figsize))
     i = 1
-    for image, mask in dataset.take(10): # data_generatorから10回取り出し。
+    for image, mask in dataset.take(10):
         plt.subplot(5, 5, i)
-        plt.imshow(keras.preprocessing.image.array_to_img(image[0])) # batch単位で取り出されるのでミニバッチの1枚目を表示。
+        plt.imshow(keras.preprocessing.image.array_to_img(image[0]))
         plt.grid(False); plt.xticks([]); plt.yticks([]); plt.grid(False)
         i += 1
         plt.subplot(5, 5, i)
@@ -279,9 +259,6 @@ def CheckDataset(dataset, figsize:int=20, colormap_path:str=None):
     
 
 class UpdatedMeanIoU(tf.keras.metrics.MeanIoU):
-    """
-    IoUをmonitoringに使う用
-    """
     def __init__(self,
                  y_true=None,
                  y_pred=None,
@@ -291,8 +268,6 @@ class UpdatedMeanIoU(tf.keras.metrics.MeanIoU):
         super().__init__(num_classes = num_classes,name=name, dtype=dtype)
     def update_state(self, y_true, y_pred, sample_weight=None):
         y_pred = tf.math.argmax(y_pred, axis=-1)
-        # 親クラスに既にあるupdate_state関数を呼び出す。
-        # デフォルトではy_predはargmaxされてないものを受け取ることになっているので、上でy_predを処理したものを親クラスのupdate_stateに渡すように工夫。
         return super().update_state(y_true, y_pred, sample_weight)
     
     
@@ -301,16 +276,17 @@ def CompileModel(model,
                  learning_rate=0.001, 
                  decay=0.0001,
                  IoU=True):
-    """""""""""""""""""""""
-    定義したモデルをコンパイル
-    ・model引数に定義したmodelを指定
-    ・分類クラス数: num_classes
-    ・optimizerはAdamを使用。learning_rate, decayはAdam用の引数
-    ・IoUをmetricsに使用するなら、Trueにする。
+    """
+    Compiles the defined model.
+    - Specify the model to compile using the model argument.
+    - num_classes: number of classification classes
+    - Uses Adam optimizer; learning_rate and decay are parameters for Adam.
+    - Set IoU=True if IoU is to be used as a metric.
 
-    ・返り値はmodelなのでmodel = CompileModel(引数)のように使う。
-     (実際はmodel=に返り値を返さなくても引数に指定したモデルのcompileは保存される。)
-    """""""""""""""""""""""
+    - Returns the compiled model, so it can be used as:
+      model = CompileModel(...)
+      (In practice, compile is applied in-place even without reassignment.)
+    """
     if IoU==True:
         model.compile(
             optimizer=keras.optimizers.Adam(learning_rate=learning_rate, decay=decay),
@@ -346,24 +322,25 @@ def FitModel(
     Checkpoint_freq:int=10,
     TensorBoard:bool=True
 ):
-    """""""""""""""""""""""
-    モデルの訓練
-    ・model引数にコンパイル済みのmodelを指定
-    ・train_dataset, val_datasetにGenerateDataset()で作成したdatasetインスタンスを指定
-    ・epochsに最大エポック数を指定
-    ・model_save_nameには訓練済みモデルの保存名を記入。
-    ・早期終了を仕込む場合、EarlyStop=Trueにする。
-     どのmetricsをモニタリング対象とするかをEarlyStop_monitor引数で指定し、monitoring metricsが何epoch変動無ければ早期終了とるつかをEarlyStop_patience引数で指定する。
-    ・学習率を変動させる場合、Reduce_lr=Trueにする。
-     どのmetricsをモニタリング対象とするかをReduce_lr_monitor引数で指定し、monitoring metricsが何epoch変動が無ければ学習率を変動させるかをReduce_lr_patience引数で指定する。
-     学習率の変動係数をReduce_lr_factor, 最小学習率をReduce_lr_minで指定。Reduce_lr_factorが0.5なら学習率が1/2倍ずつ減少する。
-    ・学習の途中保存が必要であればCheckpoint=Trueとする。
-     保存先フォルダと何epochに一度保存するか指定する。
+    """
+    Trains the model.
+    - Specify a compiled model with the model argument.
+    - Provide dataset instances created by GenerateDataset() for train_dataset and val_dataset.
+    - Set the maximum number of epochs with epochs.
+    - model_save_name specifies the filename for saving the trained model.
+    - To enable early stopping, set EarlyStop=True.
+      Specify the monitored metric with EarlyStop_monitor and the patience (number of epochs with no improvement) with EarlyStop_patience.
+    - To adjust the learning rate during training, set Reduce_lr=True.
+      Specify the monitored metric with Reduce_lr_monitor and the patience with Reduce_lr_patience.
+      Set the reduction factor with Reduce_lr_factor and the minimum learning rate with Reduce_lr_min.
+      For example, if Reduce_lr_factor=0.5, the learning rate is halved each time.
+    - To enable checkpointing, set Checkpoint=True.
+      Specify the save directory and the interval (in epochs) for saving.
 
-    ・返り値は学習過程なので、history=FitModel(引数)のように使用する。
-     (ちゃんとmodelに重みは保存される。)
-    """""""""""""""""""""""
-    ## callbackの設定
+    - Returns the training history, so it can be used as:
+      history = FitModel(...)
+      (Model weights are properly saved during training.)
+    """
     callbacks=[]
     if EarlyStop is True:
         earlystop = tf.keras.callbacks.EarlyStopping(monitor=EarlyStop_monitor,patience=EarlyStop_patience)
@@ -387,19 +364,16 @@ def FitModel(
         tensorboard_callback = keras.callbacks.TensorBoard(log_dir="tflog/", histogram_freq=1)
         callbacks.append(tensorboard_callback)
     
-    ## callbacksが無かったら。
     if not callbacks:
         history = model.fit(train_dataset,
                         validation_data=val_dataset,
                         epochs=epochs)
-    ## callbacksがあったら
     else:
         history = model.fit(train_dataset,
                         validation_data=val_dataset,
                         callbacks=callbacks,
                         epochs=epochs)
     
-    ## モデルの保存
     model.save(model_save_name)
     model.save(f"{model_save_name}.h5")
     
@@ -407,14 +381,14 @@ def FitModel(
     
 
 
-""" 学習historyのplot"""
+""" Plot training history """
 def PlotHistory(
     history,
     figsize:int=5):
     
     keys = list(history.history.keys())
     keys = [key for key in keys if "lr" not in key]
-    ncols = int(len([key for key in keys if "val" not in key])) # valとついていないkeyの数を調べる。
+    ncols = int(len([key for key in keys if "val" not in key]))
     
     fig, axes = plt.subplots(ncols=ncols, figsize=(figsize*ncols,figsize), tight_layout=True, facecolor="whitesmoke")
     
@@ -425,7 +399,7 @@ def PlotHistory(
     plt.show()
 
 
-""" Train, Val画像で予測"""
+""" Run prediction on training and validation images """
 def CheckPrediction(
     model,
     train_image_paths:list[str],
@@ -447,7 +421,6 @@ def CheckPrediction(
         image.set_shape([None, None, 3])
         image = tf.cast(image, tf.float32)
         p_img = image/127.5 - 1 if center_zero is True else image/255
-        # 元画像と、予測用にpreprocessした画像を返す。
         return image, p_img
     
     def show_img_mask(
@@ -462,18 +435,15 @@ def CheckPrediction(
             img = keras.preprocessing.image.array_to_img(img)
             images.append(img)
             
-            # preprocessした画像を使ってマスクを予測
             p_img = model.predict(np.expand_dims((p_img), axis=0), verbose=0)
             p_img = np.squeeze(p_img)
             p_img = np.argmax(p_img, axis=-1)
-            # label indexをRGBに変換。colormap_pathの指定が無ければlabel_indexのまま返す。
             if colormap_path is not None:
                 p_img = LabelToColorMask(label_img=p_img, colormap_path=colormap_path,pallete_mode=False)
                 predictions.append(p_img)
             else:
                 predictions.append(p_img)
         
-        # 元画像と予測マスクを並べて表示
         plt.figure(figsize = (figsize,figsize), tight_layout=True)
         j = 1
         for i in range(check_num):
