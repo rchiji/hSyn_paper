@@ -1,30 +1,30 @@
 import os
+import h5py
+import joblib
 import gc
 import json
-import random
-import joblib
-import faiss
-import h5py
-import matplotlib
-import matplotlib.font_manager as fm
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 import numpy as np
 import pandas as pd
 import polars as pl
-import igraph as ig
-import seaborn as sns
-import leidenalg as la
 import scipy.sparse as sp
-from tqdm import tqdm
-from glob import glob
 from pathlib import Path
-from collections import defaultdict
+from tqdm import tqdm
+import random
+from sklearn.decomposition import PCA
+import umap
+import faiss
+import igraph as ig
+import leidenalg as la
+import matplotlib
+import matplotlib.font_manager as fm
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-all_data_combined_knee = joblib.load("tmp/all_data_combined_knee.pkl")
+
+all_data_combined_knee = joblib.load("03_python_outs/pkl/all_data_combined_knee.pkl")
 
 
-with h5py.File("GNN_InOut.h5", "r") as f:
+with h5py.File("../GNN/GNN_InOut.h5", "r") as f:
     dfs = []
     for case in f.keys(): 
         index = f[case]["index"][:]
@@ -56,11 +56,59 @@ all_data_combined_knee_vessel = all_data_combined_knee.filter(
     pl.col("label").is_in(["vessel","vessel(large)"])
 )
 
-# joblib.dump(all_data_combined_knee, "pkl/all_data_combined_knee_with_label.pkl")
+joblib.dump(all_data_combined_knee, "03_python_outs/pkl/all_data_combined_knee_with_label.pkl")
+
+
+
+# Dimensionality_reduction
+feature_columns = all_data_combined_knee_vessel.columns[1:65]
+features = all_data_combined_knee_vessel.select(pl.col(feature_columns)).to_numpy()
+
+pca = PCA(n_components=64, random_state=123)
+pca_result = pca.fit_transform(features)
+
+plt.plot(np.arange(1, 65), pca.explained_variance_, marker='o')
+plt.title("PCA - Explained Variance per Component")
+plt.xlabel("Principal Component")
+plt.ylabel("Explained Variance")
+plt.grid(True)
+plt.show()
+
+std_devs = np.sqrt(pca.explained_variance_)
+prop_var = pca.explained_variance_ratio_ 
+cum_prop = np.cumsum(pca.explained_variance_ratio_)
+pca_summary = pd.DataFrame({
+    "Standard Deviation": std_devs,
+    "Proportion of Variance": prop_var,
+    "Cumulative Proportion": cum_prop
+}, index=[f"PC{i+1}" for i in range(len(std_devs))])
+
+with pd.option_context("display.max_rows", None):
+    print(pca_summary)
+
+tile_ids = all_data_combined_knee_vessel[:, 0].to_numpy()
+donors = all_data_combined_knee_vessel[:, 65].to_numpy()
+pca_df = pd.DataFrame(pca_result, columns=[f"PC{i+1}" for i in range(pca_result.shape[1])])
+pca_df["TileID"] = tile_ids
+pca_df["Donor"] = donors
+
+joblib.dump(pca_df, "03_python_outs/pkl/pca_df_vessel_20260318.pkl")
+joblib.dump(pca_result, "03_python_outs/pkl/pca_model_vessel_20260318.pkl")
+
+pca_result_select = pca_result[:, :13]
+
+reducer = umap.UMAP(n_neighbors=15, min_dist=0.05, n_components=2, random_state=123)
+umap_result = reducer.fit_transform(pca_result_select)
+umap_df = pd.DataFrame(umap_result, columns=["UMAP1", "UMAP2"])
+umap_df["TileID"] = tile_ids
+umap_df["Donor"] = donors
+joblib.dump(umap_df, "03_python_outs/pkl/umap_df_vessel_20260318.pkl")
+joblib.dump(umap_result, "03_python_outs/pkl/umap_model_vessel_20260318.pkl")
+
 
 
 # Clustering
-OUTDIR = "02_Clustering/leiden_pipeline_outs/vessel"
+OUTDIR = "03_python_outs/Clustering/leiden_pipeline_outs/vessel"
 os.makedirs(OUTDIR, exist_ok=True)
 ## neighbor search
 K = 20
@@ -79,22 +127,22 @@ SHIFT_TO_01 = False
 SYMMETRIZE_MODE = "union"
 
 
-feature_cols = all_data_combined_knee_vessel.columns[1:65]
-meta_cols = [c for c in all_data_combined_knee_vessel.columns if c not in feature_cols]
+feature_columns = all_data_combined_knee_vessel.columns[1:65]
+meta_cols = [c for c in all_data_combined_knee_vessel.columns if c not in feature_columns]
 meta_df = all_data_combined_knee_vessel.select(meta_cols)
 
-X = all_data_combined_knee_vessel.select(feature_cols).to_numpy()
+X = all_data_combined_knee_vessel.select(feature_columns).to_numpy()
 if X.dtype != np.float32:
     X = X.astype(np.float32, copy=False)
+
 X = np.ascontiguousarray(X)
 
 
 if USE_COSINE and NORMALIZE_FOR_COSINE:
     norms = np.linalg.norm(X, axis=1, keepdims=True)
     X = X / (norms + 1e-12)
-    print("Applied L2 normalization for cosine similarity.")
 
-# np.save(os.path.join(OUTDIR, "normalized_features_vessel.npy"), X)
+np.save(os.path.join(OUTDIR, "normalized_features_vessel.npy"), X)
 
 
 metric = faiss.METRIC_INNER_PRODUCT if USE_COSINE else faiss.METRIC_L2
@@ -117,23 +165,23 @@ if USE_COSINE:
 else:
     Dsim = 1.0 / (1.0 + Dsim) 
 
-# np.save(os.path.join(OUTDIR, f"knn_indices_K{K}.npy"), I)
-# np.save(os.path.join(OUTDIR, f"knn_sims_K{K}.npy"), Dsim)
+np.save(os.path.join(OUTDIR, f"knn_indices_K{K}.npy"), I)
+np.save(os.path.join(OUTDIR, f"knn_sims_K{K}.npy"), Dsim)
 
 
 ## Check
-# N, D = X.shape
-# print(f"Feature matrix: {X.shape}, dtype={X.dtype}")
-# print(I.shape, I.dtype, Dsim.shape, Dsim.dtype)
-# 
-# assert I.min() >= 0 and I.max() < N, "neighbor index out of range"
-# self_hit = (I == np.arange(N, dtype=I.dtype)[:, None]).any()
-# print("Has self neighbor?", bool(self_hit))  # False expected
-# 
-# assert np.isfinite(Dsim).all(), "NaN/Inf detected in similarities"
-# print("sim min/max:", float(Dsim.min()), float(Dsim.max()))
-# if MAKE_WEIGHTS_NONNEG or SHIFT_TO_01:
-#     assert float(Dsim.min()) >= 0.0, "Weights must be non-negative for stability."
+N, D = X.shape
+print(f"Feature matrix: {X.shape}, dtype={X.dtype}")
+print(I.shape, I.dtype, Dsim.shape, Dsim.dtype)
+
+assert I.min() >= 0 and I.max() < N, "neighbor index out of range"
+self_hit = (I == np.arange(N, dtype=I.dtype)[:, None]).any()
+print("Has self neighbor?", bool(self_hit))  # False expected
+
+assert np.isfinite(Dsim).all(), "NaN/Inf detected in similarities"
+print("sim min/max:", float(Dsim.min()), float(Dsim.max()))
+if MAKE_WEIGHTS_NONNEG or SHIFT_TO_01:
+    assert float(Dsim.min()) >= 0.0, "Weights must be non-negative for stability."
 # -> Feature matrix: (201631, 64), dtype=float32
 # -> (201631, 20) int64 (201631, 20) float32
 # -> Has self neighbor? False
@@ -164,28 +212,27 @@ final_w = W_coo.data[upper_mask].astype(np.float32)
 print(f"Edges (unique, undirected): {final_i.size:,}")
 assert np.all(final_w >= 0.0), "Negative weights detected after symmetrization."
 
-# np.save(os.path.join(OUTDIR, f"edges_src_K{K}.npy"), final_i)
-# np.save(os.path.join(OUTDIR, f"edges_dst_K{K}.npy"), final_j)
-# np.save(os.path.join(OUTDIR, f"edges_w_K{K}.npy"), final_w)
+np.save(os.path.join(OUTDIR, f"edges_src_K{K}.npy"), final_i)
+np.save(os.path.join(OUTDIR, f"edges_dst_K{K}.npy"), final_j)
+np.save(os.path.join(OUTDIR, f"edges_w_K{K}.npy"), final_w)
 
 
 ## Check
-# print("Constructing igraph graph...")
-# g = ig.Graph(n=N, directed=False)
-# BATCH = 5_000_000
-# for start in tqdm(range(0, len(final_i), BATCH)):
-#     end = min(start + BATCH, len(final_i))
-#     edges_batch = list(zip(final_i[start:end].tolist(), final_j[start:end].tolist()))
-#     g.add_edges(edges_batch)
-#     del edges_batch
-# gc.collect()
-# # weight
-# assert g.ecount() == len(final_w), "Edge count mismatch for weight assignment."
-# g.es["weight"] = final_w.tolist()
-# print(g.summary())
-# comp = g.components(mode="WEAK")
-# gcc = comp.giant().vcount() / N
-# print(f"GCC ratio: {gcc:.4%}")
+g = ig.Graph(n=N, directed=False)
+BATCH = 5_000_000
+for start in tqdm(range(0, len(final_i), BATCH)):
+    end = min(start + BATCH, len(final_i))
+    edges_batch = list(zip(final_i[start:end].tolist(), final_j[start:end].tolist()))
+    g.add_edges(edges_batch)
+    del edges_batch
+gc.collect()
+### weight
+assert g.ecount() == len(final_w), "Edge count mismatch for weight assignment."
+g.es["weight"] = final_w.tolist()
+print(g.summary())
+comp = g.components(mode="WEAK")
+gcc = comp.giant().vcount() / N
+print(f"GCC ratio: {gcc:.4%}")
 # -> Constructing igraph graph...
 # -> 100%|██████████| 1/1 [00:00<00:00,  1.51it/s]
 # -> IGRAPH U-W- 201631 3119870 -- 
@@ -225,25 +272,188 @@ for res in RESOLUTIONS:
     out_pl = meta_df.with_columns(pl.Series(name=f"cluster_res_{res}", values=labels))
     out_pl.write_csv(os.path.join(OUTDIR, f"labels_with_meta_res{res}.tsv"), separator="\t")
 
-# joblib.dump(partitions, os.path.join(OUTDIR, "leiden_res_comparison.pkl"))
+joblib.dump(partitions, os.path.join(OUTDIR, "leiden_res_comparison.pkl"))
 
 
 # Visualization
+## UMAP
+LABELDIR = Path("03_python_outs/Clustering/leiden_pipeline_outs/vessel")
+resolutions = [0.05, 0.1]
+
+df_all = umap_df.copy()
+df_all["TileID"] = df_all["TileID"].astype(str)
+
+for res in resolutions:
+    lab = pl.read_csv(LABELDIR / f"labels_with_meta_res{res}.tsv", separator="\t")
+    lab_df = lab.to_pandas()
+    lab_df["ID"] = lab_df["ID"].astype(str)
+    colname = f"cluster_res_{res}"
+    df_all = df_all.merge(lab_df[["ID", colname]], left_on="TileID", right_on="ID", how="left")
+    df_all.drop(columns=["ID"], inplace=True)
+
+label = []
+for donor in df_all["Donor"].unique():
+    with h5py.File("../GNN/GNN_InOut.h5", mode="r") as f:
+        idx = f[donor]["index"][:].astype(str)
+        maxFeature = f[donor]["tile_maxLabel"][:].astype(str)
+    for i, lab in zip(idx, maxFeature):
+        label.append({"Donor": donor, "ID": i, "Label": lab})
+id_label_df = pd.DataFrame(label)
+
+id_label_df["ID"] = id_label_df["ID"].astype(str)
+
+df_all = df_all.merge(
+    id_label_df[["ID", "Label"]],
+    left_on="TileID", right_on="ID",
+    how="left"
+)
+
+joblib.dump(df_all, "03_python_outs/pkl/combined_df_umap_label_leiden_vessel.pkl")
+
+
+fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial.ttf")
+fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial_Bold.ttf")
+fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial_Italic.ttf")
+fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial_Bold_Italic.ttf")
+
+plt.rcParams.update({
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
+    "font.family": "Arial",
+    "font.sans-serif": ["Arial"],
+})
+
+rename_map = {
+    "Fibro(dense,irregular)": "Fibrous tissue\n(dense, irregular)",
+    "Fibro(dense,regular)":   "Fibrous tissue\n(dense, regular)",
+    "Fibro(loose)":           "Fibrous tissue\n(loose)",
+    "vessel":                 "Micro vessel",
+    "vessel(large)":          "Large vessel",
+    "lining":                 "Lining",
+    "Immune cells":           "TLS",
+    "plasma":                 "Plasma",
+    "adipose":                "Adipose",
+    "muscle":                 "Muscle",
+    "Stroma":                 "Stroma",
+    "RBC":                    "RBC"
+}
+
+label_order = [
+    "Adipose",
+    "Fibrous tissue\n(loose)",
+    "Fibrous tissue\n(dense, irregular)",
+    "Fibrous tissue\n(dense, regular)",
+    "Stroma",
+	"TLS",
+    "Plasma",
+    "Micro vessel",
+    "Large vessel",	
+	"RBC",
+    "Lining",	
+    "Muscle"
+]
+
+df_all["Label_renamed"] = df_all["Label"].replace(rename_map)
+
+POINT_SIZE = 0.1
+ALPHA = 0.8
+LINEWIDTH_SPINE = 0.5
+
+col = f"cluster_res_0.05"
+turbo3_hex = ["#30123B", "#FABA39", "#7A0403"]
+palette = {0: turbo3_hex[0], 1: turbo3_hex[1], 2: turbo3_hex[2]}
+
+fig, ax = plt.subplots(figsize=(2.5, 2.25))
+fig.subplots_adjust(right=0.82)
+sns.scatterplot(
+    data=df_all, x="UMAP1", y="UMAP2",
+    hue=col, palette=palette,
+    s=POINT_SIZE, linewidth=0, alpha=ALPHA, ax=ax, legend="full"
+)
+
+for collection in ax.collections:
+    collection.set_rasterized(True)
+
+for side in ["top", "right", "bottom", "left"]:
+    ax.spines[side].set_visible(True)
+    ax.spines[side].set_linewidth(LINEWIDTH_SPINE)
+
+ax.set_xlabel("UMAP1", fontsize=5)
+ax.set_ylabel("UMAP2", fontsize=5)
+ax.tick_params(axis="both", labelsize=4, width=0.4, length=2)
+
+ax.legend(
+    bbox_to_anchor=(1.02, 1), loc="upper left",
+    borderaxespad=0., title_fontsize=5, fontsize=5, title="Cluster",
+    frameon=False, markerscale=5
+)
+
+out_png = f"99_Fig/fig5/umap_res0.05_leiden_random_vessel.png"
+out_pdf = f"99_Fig/fig5/umap_res0.05_leiden_random_vessel.pdf"
+
+fig.savefig(out_png, dpi=300, bbox_inches="tight")
+fig.savefig(out_pdf, dpi=300, bbox_inches="tight")
+
+plt.close(fig)
+
+paired = sns.color_palette("Paired", n_colors=len(label_order))
+palette_dict = dict(zip(label_order, paired))
+
+df_plot = df_all.copy()
+df_plot["Label_renamed"] = pd.Categorical(
+    df_plot["Label_renamed"],
+    categories=label_order,
+    ordered=True
+)
+
+df_plot = df_plot.sort_values("Label_renamed")
+
+fig, ax = plt.subplots(figsize=(2.5, 2.25))
+fig.subplots_adjust(right=0.82)
+sns.scatterplot(
+    data=df_plot, x="UMAP1", y="UMAP2",
+    hue="Label_renamed", hue_order=label_order, 
+    palette=palette_dict,
+    s=POINT_SIZE, linewidth=0, alpha=ALPHA, ax=ax, legend="full"
+)
+
+for collection in ax.collections:
+    collection.set_rasterized(True)
+
+ax.set_xlabel("UMAP1", fontsize=5)
+ax.set_ylabel("UMAP2", fontsize=5)
+ax.tick_params(axis="both", labelsize=4, width=0.4, length=2)
+for spine in ax.spines.values():
+    spine.set_visible(True)
+    spine.set_linewidth(LINEWIDTH_SPINE)
+
+ax.legend(
+    bbox_to_anchor=(1.02, 1), loc="upper left",
+    borderaxespad=0., title_fontsize=5, fontsize=5, title="Label",
+    frameon=False, markerscale=5
+)
+
+plt.savefig("99_Fig/fig5/umap_by_label_vessel.png", dpi=300, bbox_inches="tight")
+plt.savefig("99_Fig/fig5/umap_by_label_vessel.pdf", dpi=300, bbox_inches="tight")
+plt.close(fig)
+
+
+## Community
 RES = 0.05
 OUT_CLUSTER_TAG = f"Vessel_Leiden_res{RES}" 
-OUT_DIR_TXT = f"03_Community/SLICTile/SLICTile_cluster_res{RES}_vessel"
+OUT_DIR_TXT = f"03_python_outs/Community/SLICTile/SLICTile_cluster_res{RES}_vessel"
 os.makedirs(OUT_DIR_TXT, exist_ok=True)
 
-lab = pl.read_csv(f"02_Clustering/leiden_pipeline_outs/vessel/labels_with_meta_res{RES}.tsv", separator="\t")
+lab = pl.read_csv(f"03_python_outs/Clustering/leiden_pipeline_outs/vessel/labels_with_meta_res{RES}.tsv", separator="\t")
 assert "ID" in lab.columns and "Donor" in lab.columns, "TileID/Donor: not found"
 cl_col = f"cluster_res_{RES}"
 assert cl_col in lab.columns, f"{cl_col} : not found"
 lab_df = lab.select(["ID", "Donor", cl_col]).to_pandas()
 lab_df[cl_col] = lab_df[cl_col].astype(int)
 
-## Reconstruct info_dict
+### Reconstruct info_dict
 info_dict = {}
-with h5py.File("GNN_InOut.h5", mode="r") as f:
+with h5py.File("../GNN/GNN_InOut.h5", mode="r") as f:
     donors = list(f.keys())
     for donor in tqdm(donors, desc="Load H5"):
         idx = f[donor]["index"][:].astype(str)
@@ -267,7 +477,7 @@ with h5py.File("GNN_InOut.h5", mode="r") as f:
             "id_max": maxID,
         }
 
-## Assign Leiden clusters by donor × TileID
+### Assign Leiden clusters by donor × TileID
 for donor, d in tqdm(info_dict.items(), desc="Attach Leiden"):
     sub = lab_df[lab_df["Donor"] == donor].set_index("ID")
     cl = sub.reindex(d["index"])[cl_col]
@@ -278,7 +488,7 @@ for donor, d in tqdm(info_dict.items(), desc="Attach Leiden"):
 valid_donors = set(lab_df["Donor"].unique())
 info_dict = {d:obj for d, obj in info_dict.items() if d in valid_donors}
 
-## Join cluster numbers, features, and input composition across all tiles
+### Join cluster numbers, features, and input composition across all tiles
 all_features = []
 all_input = []
 all_idx = []
@@ -302,21 +512,7 @@ id_to_donor = df_idx.set_index("ID")["Donor"]
 assert id_to_donor.index.is_unique, "ID: not unique"
 assert set(cluster_series.index).issubset(set(id_to_donor.index)), "ID→Donor: deficient"
 
-## Medoid extraction
-medoids = {} 
-for cl, ids in cluster_series.groupby(cluster_series).groups.items():
-    if cl < 0:
-        continue
-    ids = list(ids)
-    F = X_feat.loc[ids]
-    centroid = F.mean(axis=0).values
-    dist = np.linalg.norm(F.values - centroid[None, :], axis=1)
-    argmin = np.argmin(dist)
-    tile_id = F.index[argmin]
-    donor = id_to_donor.at[tile_id]
-    medoids[cl] = (donor, tile_id)
-
-## Proportion of 'within-tile composition' for each cluster
+### Proportion of 'within-tile composition' for each cluster
 row_sums = X_in.sum(axis=1).replace(0, np.nan)
 X_in_norm = X_in.div(row_sums, axis=0).fillna(0.0)
 df_ratio_merge_mean_tile = X_in_norm.groupby(cluster_series).mean() * 100
@@ -326,10 +522,10 @@ className = ["Immune cells", "plasma", "Fibro(loose)", "Fibro(dense,regular)",
 if df_ratio_merge_mean_tile.shape[1] == len(className):
     df_ratio_merge_mean_tile.columns = className
 
-# Proportion of 'community (5-hop) composition' for each cluster
+### Proportion of 'community (5-hop) composition' for each cluster
 df_comm_ratio_list = []
 for donor, d in info_dict.items():
-    with h5py.File("GNN_InOut.h5", mode="r") as f:
+    with h5py.File("../GNN/GNN_InOut.h5", mode="r") as f:
         ratio = f[donor]["community_label_ratio"][:]
         idx = f[donor]["index"][:].astype(str)
         maxFeature = f[donor]["tile_maxLabel"][:].astype(str)
@@ -348,36 +544,18 @@ df_ratio_merge_mean_comm = df_comm_ratio.groupby("Cluster").mean().drop(columns=
 if df_ratio_merge_mean_comm.shape[1] == len(className):
     df_ratio_merge_mean_comm.columns = className
 
-fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial.ttf")
-fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial_Bold.ttf")
-fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial_Italic.ttf")
-fm.fontManager.addfont("/usr/share/fonts/truetype/msttcorefonts/Arial_Bold_Italic.ttf")
-plt.rcParams.update({
-    "pdf.fonttype": 42,
-    "ps.fonttype": 42,
-    "font.family": "Arial",
-    "font.sans-serif": ["Arial"],
-})
-
-rename_map = {
-    "Fibro(dense,irregular)":         "Fibrous tissue\n(dense, irregular)",
-    "Fibro(dense,regular)":           "Fibrous tissue\n(dense, regular)",
-    "Fibro(loose)":                   "Fibrous tissue\n(loose)",
-    "vessel":                         "Micro vessel",
-    "vessel(large)":                  "Large vessel",
-    "lining":                         "Lining",
-    "Immune cells":                   "TLS",
-    "plasma":                         "Plasma",
-    "adipose":                        "Adipose",
-    "muscle":                         "Muscle"
-}
 
 def scale_rows_zscore(mat: pd.DataFrame, eps=1e-9):
     mean = mat.mean(axis=1)
     std  = mat.std(axis=1, ddof=1).replace(0, eps)
     return mat.sub(mean, axis=0).div(std, axis=0)
 
-def heatmap_percent_modified_2(df, color, title_text, out_name, scale_row=True):
+def rename_tissues_columns(df):
+    df2 = df.copy()
+    df2.columns = [rename_map.get(c, c) for c in df2.columns]
+    return df2
+
+def heatmap_percent_modified(df, color, title_text, out_name, scale_row=True):
     df_rename = rename_tissues_columns(df)
     mat = df_rename.T
     if scale_row:
@@ -415,38 +593,27 @@ def heatmap_percent_modified_2(df, color, title_text, out_name, scale_row=True):
     plt.savefig(out_name)
     plt.show()
 
-heatmap_percent_modified_2(
+heatmap_percent_modified(
     df_ratio_merge_mean_tile,
     color="RdBu_r",
     title_text="Center tile",
-    out_name=f"03_Community/Proportion/vessel/TileComp_{OUT_CLUSTER_TAG}.pdf",
+    out_name=f"99_Fig/fig5/TileComp_{OUT_CLUSTER_TAG}.pdf",
 	scale_row=True
 )
-heatmap_percent_modified_2(
+heatmap_percent_modified(
     df_ratio_merge_mean_comm,
     color="RdBu_r",
     title_text="Tissue community (5-hop)",
-    out_name=f"03_Community/Proportion/vessel/CommComp_{OUT_CLUSTER_TAG}.pdf",
+    out_name=f"99_Fig/fig5/CommComp_{OUT_CLUSTER_TAG}.pdf",
 	scale_row=True
 )
-
-## List of representative tiles (for preparation such as extraction in QuPath)
-medoid_df = (pd.DataFrame.from_dict(medoids, orient="index", columns=["Donor","TileID"])
-               .sort_index().rename_axis("Cluster").reset_index())
-medoid_df.to_csv(f"leiden_pipeline_res/vessel/Medoids_{OUT_CLUSTER_TAG}.tsv", sep="\t", index=False)
-print(medoid_df.head())
-
-with h5py.File("GNN_InOut.h5", mode="a") as f:
-    for donor, d in tqdm(info_dict.items(), desc="Write H5 Leiden"):
-        ds_name = OUT_CLUSTER_TAG 
-        if ds_name in f[donor]:
-            del f[donor][ds_name]
-        f[donor].create_dataset(ds_name, data=d[OUT_CLUSTER_TAG].astype(np.int32), compression="gzip")
 
 for donor, d in info_dict.items():
     write_df = pd.DataFrame({"ID": d["index"], "Cluster": d[OUT_CLUSTER_TAG]})
     write_df.to_csv(os.path.join(OUT_DIR_TXT, f"{donor}.txt"), sep="\t", index=False)
 
+
+## Spatial images
 label_order = [
     "Adipose",
     "Fibrous tissue\n(loose)",
@@ -551,7 +718,7 @@ def plot_cluster(sample_info_dict, cluster_array, num_cluster,
         plt.show()
     return fig
 
-out_dir = "03_Community/Map/Map_CellType_Leiden0.05_vessel"
+out_dir = "99_Fig/fig5/Map_CellType_Leiden0.05_vessel"
 os.makedirs(out_dir, exist_ok=True)
 class_names = [
     "Immune cells","plasma","Fibro(loose)","Fibro(dense,regular)",
@@ -578,16 +745,4 @@ for donor in sorted(valid_donors):
     out_path = os.path.join(out_dir, f"{donor}_{OUT_CLUSTER_TAG}.pdf")
     fig.savefig(out_path, bbox_inches="tight", dpi=300)
     plt.close(fig)
-
-order_cols = ["Immune cells","plasma","Fibro(loose)","Fibro(dense,regular)",
-              "Fibro(dense,irregular)","lining","vessel","vessel(large)",
-              "adipose","Stroma","muscle","RBC"]
-M_tile = (df_ratio_merge_mean_tile
-          .reindex(columns=order_cols)
-          .sort_index())
-M_tile.to_csv(f"leiden_pipeline_res/vessel/Matrix_TileComp_res{RES}_vessel.tsv", sep="\t", float_format="%.3f")
-M_comm = (df_ratio_merge_mean_comm
-          .reindex(columns=order_cols)
-          .sort_index())
-M_comm.to_csv(f"leiden_pipeline_res/vessel/Matrix_CommComp_res{RES}_vessel.tsv", sep="\t", float_format="%.3f")
 

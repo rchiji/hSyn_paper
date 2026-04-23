@@ -4,7 +4,7 @@ library(ggplot2)
 library(pheatmap)
 library(patchwork)
 
-file_paths <- list.files(path = "00_src/Annotation_ratio/", full.names = TRUE)
+file_paths <- list.files(path = "../HE_semantic_segmentation/measure/Annotation_ratio/", full.names = TRUE)
 samplenames <- sapply(file_paths, function(x) {
   x <- basename(x)
   gsub(pattern = "_HE.*",replacement = "",x)

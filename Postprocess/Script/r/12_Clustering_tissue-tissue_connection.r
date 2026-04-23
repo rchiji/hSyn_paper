@@ -58,7 +58,7 @@ ggsave("99_Fig/fig4/tSNE.pdf", plot = plot_tsne, width = 2.5, height = 1.5)
 
 df[,42:44] <- tsne_data[,1:3]
 
-# write.table(df, "01_formatted/annotations_full_tissue_conection_cluster.txt", sep = "\t", row.names = TRUE, col.names = NA)
+write.table(df, "01_formatted/annotations_full_tissue_conection_cluster.txt", sep = "\t", row.names = TRUE, col.names = NA)
 
 
 # Proportion
@@ -553,35 +553,7 @@ ggsave("99_Fig/fig4/tSNE_cluster_KOOS_post12.pdf", plot = plot_KOOS_Post12, widt
 df_long_score <- df_OA %>%
   pivot_longer(cols = c(35,36,40,41), names_to = "Score", values_to = "Value")
 
-df_long_synovitis <- df_long_score %>% filter(Score == "Synovitis_score")
 df_long_Krenn <- df_long_score %>% filter(Score == "Total")
-df_long_OARSI <- df_long_score %>% filter(Score == "OARSI_score")
-
-plot_synovitis <- ggplot(df_long_synovitis, aes(x = cluster, y = Value, color = cluster)) +
-  geom_boxplot(width = 0.8, outlier.shape = NA, linewidth = 0.1, fill = "white", color = "black") +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
-  scale_y_continuous(breaks = seq(0, 4, 1)) +
-  coord_cartesian(ylim = c(0, 4.5)) +
-  labs(x = "Synovitis score",  y = "Score") +
-  scale_color_manual(values = c("1" = "#D8C6C2", "2" = "#F3B2A6", "3" = "#C73A3A", "4" = "#7F1212")) +
-  theme_classic() +
-  theme(
-    panel.border = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.ticks.y = element_line(linewidth = 0.1),
-    axis.line = element_line(linewidth = 0.1),
-    axis.title.x = element_text(size = 6),
-    axis.text.x = element_blank(),
-    axis.title.y = element_text(size = 6),
-    axis.text.y = element_text(size = 5),
-    legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5, , margin = margin(l = -5)),
-    legend.key.height = unit(0.25, "cm"),
-    legend.box.margin = margin(0, 0, 0, 0),
-    legend.margin = margin(0, 0, 0, 0))
-
-ggsave("99_Fig/fig4/tSNE_cluster_synovitis.png", plot = plot_synovitis, width = 1.5, height = 1.25)
-ggsave("99_Fig/fig4/tSNE_cluster_synovitis.pdf", plot = plot_synovitis, width = 1.5, height = 1.25)
 
 plot_krenn_synovitis <- ggplot(df_long_Krenn, aes(x = cluster, y = Value, color = cluster)) +
   geom_boxplot(width = 0.8, outlier.shape = NA, linewidth = 0.1, fill = "white", color = "black") +
@@ -608,66 +580,6 @@ plot_krenn_synovitis <- ggplot(df_long_Krenn, aes(x = cluster, y = Value, color 
 
 ggsave("99_Fig/fig4/tSNE_cluster_krenn_synovitis.png", plot = plot_krenn_synovitis, width = 1.5, height = 1.25)
 ggsave("99_Fig/fig4/tSNE_cluster_Krenn_synovitis.pdf", plot = plot_krenn_synovitis, width = 1.5, height = 1.25)
-
-plot_oarsi <- ggplot(df_long_OARSI, aes(x = cluster, y = Value, color = cluster)) +
-  geom_boxplot(width = 0.8, outlier.shape = NA, linewidth = 0.1, fill = "white", color = "black") +
-  geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
-  scale_y_continuous(breaks = seq(0, 7, 2)) +
-  coord_cartesian(ylim = c(0, 7)) +
-  labs(x = "OARSI score",  y = "Score") +
-  scale_color_manual(values = c("1" = "#D8C6C2", "2" = "#F3B2A6", "3" = "#C73A3A", "4" = "#7F1212")) +
-  theme_classic() +
-  theme(
-    panel.border = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.ticks.y = element_line(linewidth = 0.1),
-    axis.line = element_line(linewidth = 0.1),
-    axis.title.x = element_text(size = 6),
-    axis.text.x = element_blank(),
-    axis.title.y = element_text(size = 6),
-    axis.text.y = element_text(size = 5),
-    legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5, , margin = margin(l = -5)),
-    legend.key.height = unit(0.25, "cm"),
-    legend.box.margin = margin(0, 0, 0, 0),
-    legend.margin = margin(0, 0, 0, 0))
-
-ggsave("99_Fig/fig4/tSNE_cluster_OARSI.png", plot = plot_oarsi, width = 1.5, height = 1.25)
-ggsave("99_Fig/fig4/tSNE_cluster_OARSI.pdf", plot = plot_oarsi, width = 1.5, height = 1.25)
-
-
-df_OARSI <- df_OA %>%
-  filter(!is.na(OARSI_score)) %>%            
-  count(cluster, OARSI_score)
-
-df_OARSI$OARSI_score <- factor(df_OARSI$OARSI_score, levels = c("6", "5", "4"))
-
-plot_oarsi_stacked <- ggplot(df_OARSI, aes(x = cluster, y = n, fill = OARSI_score)) +
-  geom_bar(stat = "identity", position = position_fill(reverse = FALSE), width = 0.9, color = "black", linewidth = 0.1) +
-  labs(y = "OARSI score\nratio %", fill = "OARSI score") +
-  scale_y_continuous(labels = function(x) x * 100) +
-  scale_fill_manual(values = c("4" = "white", "5" = "grey", "6" = "black")) +
-  theme_classic() +
-  theme(
-    plot.title = element_blank(),
-    panel.border = element_blank(),
-    axis.ticks.x = element_line(linewidth = 0.1),
-    axis.ticks.y = element_line(linewidth = 0.1),
-    axis.line = element_line(linewidth = 0.1),
-    axis.title.x = element_blank(),
-    axis.text.x  = element_text(size = 5),
-    axis.title.y = element_text(size = 6, margin = margin(r = 0, unit = "mm") ),
-    axis.text.y  = element_text(size = 5),
-    legend.title = element_text(size = 5, margin = margin(b = 2)),
-    legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
-    legend.key.size = unit(2, "mm"),
-    legend.margin = margin(t = -1, b = -1, unit = "mm"),
-    legend.box.margin = margin(0, 0, 0, -3, unit = "mm"),
-    plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
-  )
-
-ggsave("99_Fig/fig4/tSNE_cluster_OARSI_stackedbar.png", plot = plot_oarsi_stacked, width = 1.5, height = 1.25)
-ggsave("99_Fig/fig4/tSNE_cluster_OARSI_stackedbar.pdf", plot = plot_oarsi_stacked, width = 1.5, height = 1.25)
 
 
 df_KL <- df_OA %>%

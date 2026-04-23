@@ -1,36 +1,36 @@
 import qupath.lib.gui.measure.ObservableMeasurementTableData
 // import qupath.lib.gui.commands.SummaryMeasurementTableCommand
 
-// 書き出し対象のObject
+// Objects to export
 List objects = getAnnotationObjects()
-// MeasurementListの項目一覧を取得
+// Get the list of MeasurementList entries
 
-// ObservableMeasurementTableDataのインスタンス作成
+// Create an instance of ObservableMeasurementTableData
 def ob = new ObservableMeasurementTableData()
-// 書き出し対象のObjectを登録
+// Register objects to export
 ob.setImageData(getCurrentImageData(), objects)
 List terms = ob.getAllNames()
 
-// 保存ディレクトリのパス
-String saveDir = buildFilePath(PROJECT_BASE_DIR, "Annotation_ratio_241204")
+// Path to the output directory
+String saveDir = buildFilePath(PROJECT_BASE_DIR, "measure/Annotation_ratio")
 mkdirs saveDir
-// 計測結果の書き出し先
+// Output file for measurement results
 String imageName = getCurrentImageNameWithoutExtension()
 String filePath = buildFilePath(saveDir, imageName + ".txt")
 
-// Fileクラスの変数作成
+// Create a File object
 File file = new File(filePath)
 
-// 同じファイルがあった場合に削除
-file.delete()  // この行を削除すると追記になる
-// ファイル作成
+// Delete the file if it already exists
+file.delete()  // Remove this line to append instead
+// Create a new file
 file.createNewFile()
 
 
-// StringBuilderを利用して内容をバッファに格納
+// Use StringBuilder to store content in a buffer
 StringBuilder buffer = new StringBuilder()
 
-// header部分を書いておく
+// Write header
 buffer.append("Object ID" +"\t")
 terms.eachWithIndex { key, i ->
     buffer.append(key)
@@ -42,14 +42,14 @@ terms.eachWithIndex { key, i ->
     }
 
 objects.each {
-    // 書き出すObject IDを取得
+    // Get Object ID to export
     String id = it.getID()
-    buffer.append( "${id}\t" ) // 追記
+    buffer.append( "${id}\t" ) // append
     
-    // 書き出す内容を取得
+    // Get measurement values
     def ml = it.getMeasurementList()
     
-    // 計測項目を取り出して追記
+    // Extract and append measurement items
     terms.eachWithIndex { key, i ->
         def value = ob.getNumericValue(it, key)
         if ( value.isNaN() ) {

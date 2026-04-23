@@ -7,6 +7,7 @@ library(compositions)
 
 df <- read.delim("00_src/annotations_full.txt", sep = "\t", row.names = 1)
 score <- read.delim("01_formatted/annotations_full_OARSI_Krenn.txt", sep = "\t", row.names = 1)
+# -> "annotations_full_OARSI_Krenn.txt" is "annotations_full.txt" with manually added scoring results.
 df[,37:41]  <- score[,1:5]
 df <- df[df$Joint == "Knee",]
 
@@ -51,7 +52,7 @@ ggsave("99_Fig/fig3/tSNE.pdf", plot = plot_tsne, width = 2.5, height = 1.5)
 
 df[,42:44] <- tsne_data[,1:3]
 
-# write.table(df, "01_formatted/annotations_full_tissue_proportion_cluster.txt", sep = "\t", row.names = TRUE, col.names = NA)
+write.table(df, "01_formatted/annotations_full_tissue_proportion_cluster.txt", sep = "\t", row.names = TRUE, col.names = NA)
 
 
 # Proportion

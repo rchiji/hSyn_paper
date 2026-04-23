@@ -9,7 +9,7 @@ names(turbo3_hex) <- as.character(0:2)
 
 df <- read.delim("00_src/annotations_full.txt", sep = "\t", row.names = 1)
 
-file_paths <- list.files(path = "00_src/SLICTile_cluster_res0.05_vessel/", full.names = TRUE)
+file_paths <- list.files(path = "03_python_outs/Community/SLICTile/SLICTile_cluster_res0.05_vessel/", full.names = TRUE)
 
 
 samplenames <- sapply(file_paths, function(x) {

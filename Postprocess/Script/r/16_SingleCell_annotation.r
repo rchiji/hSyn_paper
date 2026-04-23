@@ -9,20 +9,20 @@ options(future.globals.maxSize = 80 * 1024^3)
 
 
 # Preprocessing and coarse cell type annotation **********
-count1 <- Read10X(data.dir = "./02_Publicdata/scData/nonOA_1/")
-count2 <- Read10X(data.dir = "./02_Publicdata/scData/nonOA_2/")
-count3 <- Read10X(data.dir = "./02_Publicdata/scData/nonOA_3/")
-count4 <- Read10X(data.dir = "./02_Publicdata/scData/nonOA_4/")
-count5 <- Read10X(data.dir = "./02_Publicdata/scData/OA_1/")
-count6 <- Read10X(data.dir = "./02_Publicdata/scData/OA_2/")
-count7 <- Read10X(data.dir = "./02_Publicdata/scData/OA_3/")
-count8 <- Read10X(data.dir = "./02_Publicdata/scData/OA_4/")
-count9 <- Read10X(data.dir = "./02_Publicdata/scData/OA_5/")
-count10 <- Read10X(data.dir = "./02_Publicdata/scData/OA_6/")
-count11 <- Read10X(data.dir = "./02_Publicdata/scData/OA_7/")
-count12 <- Read10X(data.dir = "./02_Publicdata/scData/OA_8/")
-count13 <- Read10X(data.dir = "./02_Publicdata/scData/OA_9/")
-count14 <- Read10X(data.dir = "./02_Publicdata/scData/OA_10/")
+count1 <- Read10X(data.dir = "02_Publicdata/scData/nonOA_1/")
+count2 <- Read10X(data.dir = "02_Publicdata/scData/nonOA_2/") # GSE216651
+count3 <- Read10X(data.dir = "02_Publicdata/scData/nonOA_3/") # GSE216651
+count4 <- Read10X(data.dir = "02_Publicdata/scData/nonOA_4/") # GSE216651
+count5 <- Read10X(data.dir = "02_Publicdata/scData/OA_1/")    # GSE283080
+count6 <- Read10X(data.dir = "02_Publicdata/scData/OA_2/")    # GSE283080
+count7 <- Read10X(data.dir = "02_Publicdata/scData/OA_3/")    # GSE283080
+count8 <- Read10X(data.dir = "02_Publicdata/scData/OA_4/")    # GSE283080
+count9 <- Read10X(data.dir = "02_Publicdata/scData/OA_5/")    # GSE216651
+count10 <- Read10X(data.dir = "02_Publicdata/scData/OA_6/")   # GSE216651
+count11 <- Read10X(data.dir = "02_Publicdata/scData/OA_7/")   # GSE216651
+count12 <- Read10X(data.dir = "02_Publicdata/scData/OA_8/")   # GSE152805
+count13 <- Read10X(data.dir = "02_Publicdata/scData/OA_9/")   # GSE152805
+count14 <- Read10X(data.dir = "02_Publicdata/scData/OA_10/")  # GSE152805
 
 seuratObj1 <- CreateSeuratObject(counts = count1, project = "nonOA_1", min.cells = 3)
 seuratObj2 <- CreateSeuratObject(counts = count2, project = "nonOA_2", min.cells = 3)
@@ -46,7 +46,6 @@ table(sc@meta.data$orig.ident)
 # -> nonOA_1 nonOA_2 nonOA_3 nonOA_4    OA_1   OA_10    OA_2    OA_3    OA_4    OA_5    OA_6    OA_7    OA_8    OA_9 
 #       7611   14130   15363   12018    9042    1707    5300   10901    7613   10478   12805   10539    5100    3883
 
-# saveRDS(sc, "02_Publicdata/ver6/tmp/seuratObj_after_merge_20251022.rds")
 
 
 sc <- PercentageFeatureSet(sc, pattern = "^MT-", col.name = "percent.mt")
@@ -70,7 +69,6 @@ sc <- CellCycleScoring(sc, s.features = s.genes, g2m.features = g2m.genes, set.i
 sc[["RNA"]] <- split(sc[["RNA"]], f = sc$orig.ident)
 sc <- SCTransform(sc, vars.to.regress = c("S.Score", "G2M.Score", "percent.mt"), min_cells = 3)
 
-# saveRDS(sc, "02_Publicdata/ver6/tmp/seuratObj_after_SCT_20251022.rds")
 
 
 sc <- RunPCA(sc)
@@ -98,7 +96,6 @@ sc
 #  1 other assay present: RNA
 #  2 dimensional reductions calculated: pca, integrated.rpca
 
-# saveRDS(sc, "02_Publicdata/ver6/tmp/seuratObj_after_integration_20251022.rds")
 
 
 sc_dim10 <- RunUMAP(sc, dims = 1:10, reduction="integrated.rpca", reduction.name = "umap.rpca")
@@ -230,21 +227,19 @@ sc_lymphoid <- subset(sc, idents = "Lymphoid cell")
 sc_endothelial <- subset(sc, idents = "Endothelial cell")
 sc_mural <- subset(sc, idents = "Mural cell")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/tmp/seuratObj_after_rename_20251022.rds")
-# saveRDS(all.markers_rename, "02_Publicdata/ver6/tmp/seuratObj_after_rename_20251022.rds")
 
-# saveRDS(sc, "02_Publicdata/ver6/tmp/seuratObj_after_rename_20251022.rds")
-# saveRDS(sc_stromal, "02_Publicdata/ver6/tmp/seuratObj_stromal_20251022.rds")
-# saveRDS(sc_myeloid, "02_Publicdata/ver6/tmp/seuratObj_myeloid_20251022.rds")
-# saveRDS(sc_lymphoid, "02_Publicdata/ver6/tmp/seuratObj_lymphoid_20251022.rds")
-# saveRDS(sc_endothelial, "02_Publicdataa/ver6/tmp/seuratObj_endothelial_20251022.rds")
-# saveRDS(sc_mural, "02_Publicdata/ver6/tmp/seuratObj_mural_20251022.rds")
+saveRDS(sc, "02_Publicdata/rds/seuratObj_after_rename_20251022.rds")
+saveRDS(sc_stromal, "02_Publicdata/rds/seuratObj_stromal_20251022.rds")
+saveRDS(sc_myeloid, "02_Publicdata/rds/seuratObj_myeloid_20251022.rds")
+saveRDS(sc_lymphoid, "02_Publicdata/rds/seuratObj_lymphoid_20251022.rds")
+saveRDS(sc_endothelial, "02_Publicdataa/rds/seuratObj_endothelial_20251022.rds")
+saveRDS(sc_mural, "02_Publicdata/rds/seuratObj_mural_20251022.rds")
 
 
 
 # Fine-grained annotation of each cell type **************
 # Stromal
-sc_stromal <- readRDS("02_Publicdata/ver6/tmp/seuratObj_stromal_20251022.rds")
+sc_stromal <- readRDS("02_Publicdata/rds/seuratObj_stromal_20251022.rds")
 
 sc_stromal
 # An object of class Seurat 
@@ -295,7 +290,7 @@ sc_fib_dim30 <- FindClusters(sc_fib_dim30, resolution = 0.3)
 
 DimPlot(sc_fib_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_fib_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
-    DimPlot(sc_fib_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_fib_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 DimPlot(sc_fib_dim10, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_fib_dim20, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_fib_dim30, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) 
@@ -308,13 +303,13 @@ sc_fib <- sc_fib_dim10
 
 DimPlot(sc_fib, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_fib, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_fib, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_fib, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 sc_fib <- SetIdent(sc_fib, value = "SCT_snn_res.0.2")
 
 DimPlot(sc_fib, split.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 3)
-FeaturePlot(sc_fib, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3) # save
-FeaturePlot(sc_fib, raster = T, features = c("CLIC5","CD55","PRG4","THY1","CD34","PI16","CXCL12","CD74","IL6","MMP3","LRRC15","MMP11","SPP1","ACAN"), pt.size = 3) # save
+FeaturePlot(sc_fib, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
+FeaturePlot(sc_fib, raster = T, features = c("CLIC5","CD55","PRG4","THY1","CD34","PI16","CXCL12","CD74","IL6","MMP3","LRRC15","MMP11","SPP1","ACAN"), pt.size = 3)
 
 sc_fib <- PrepSCTFindMarkers(sc_fib)
 all.markers <- FindAllMarkers(sc_fib, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -326,7 +321,7 @@ all.markers_top30 <- all.markers %>%
     top_n(n = 30, wt = avg_log2FC)
 
 DotPlot(sc_fib, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_fib <- RenameIdents(sc_fib, "0"="Sublining-layer fibroblast")
 sc_fib <- RenameIdents(sc_fib, "1"="Sublining-layer fibroblast")
@@ -341,7 +336,7 @@ table(sc_fib@active.ident)
 #                    Doublet    Lining-layer fibroblast Sublining-layer fibroblast 
 #                       1414                      21782                      33593 
 
-DimPlot(sc_fib, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+DimPlot(sc_fib, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 
 sc_fib_2 <- subset(sc_fib, idents = c("Lining-layer fibroblast","Sublining-layer fibroblast"))
@@ -384,7 +379,7 @@ sc_fib_2_dim30 <- FindClusters(sc_fib_2_dim30, resolution = 0.3)
 
 DimPlot(sc_fib_2_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_fib_2_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
-    DimPlot(sc_fib_2_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_fib_2_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 FeaturePlot(sc_fib_2_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_fib_2_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
@@ -398,14 +393,14 @@ sc_fib_2 <- sc_fib_2_dim10
 
 DimPlot(sc_fib_2, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_fib_2, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_fib_2, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_fib_2, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
-FeaturePlot(sc_fib_2, raster = T, features = c("CLIC5","CD55","PRG4","THY1","CD34","MFAP5","PI16","APOD","CXCL14","CXCL12","CD74","IL6","MMP3","LRRC15","SPP1","ACAN"), pt.size = 3) # save
+FeaturePlot(sc_fib_2, raster = T, features = c("CLIC5","CD55","PRG4","THY1","CD34","MFAP5","PI16","APOD","CXCL14","CXCL12","CD74","IL6","MMP3","LRRC15","SPP1","ACAN"), pt.size = 3)
 
 sc_fib_2 <- SetIdent(sc_fib_2, value = "SCT_snn_res.0.2")
 
 DotPlot(sc_fib_2, features = c("CLIC5","CD55","PRG4","LRRC15","MMP3","THY1","CD34","MFAP5","PI16","APOD","CXCL14","CXCL12","CD74","IL6","SPP1","ACAN")) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_fib_2 <- PrepSCTFindMarkers(sc_fib_2)
 all.markers <- FindAllMarkers(sc_fib_2, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -424,13 +419,10 @@ sc_fib_2 <- ScaleData(sc_fib_2)
 DefaultAssay(sc_fib_2) <- "SCT"
 sc_fib_2 <- JoinLayers(sc_fib_2, assay = "RNA")
 
-DoHeatmap(sc_fib_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_fib_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_fib_2, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Stromal/all.markers_Stromal_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Stromal/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Stromal/top30.txt", sep = "\t")
 
 lining_fib.markers <- FindMarkers(sc_fib_2, ident.1 = "1", ident.2 = "4", min.pct = 0.1, logfc.threshold = 0.5)
 
@@ -443,7 +435,7 @@ sc_fib_2 <- RenameIdents(sc_fib_2, "5"="Sublining-layer fibroblast-APOD+CXCL14+"
 sc_fib_2 <- RenameIdents(sc_fib_2, "6"="Lining-layer fibroblast-MMP3+")
 
 DimPlot(sc_fib_2, shuffle = TRUE, raster = TRUE, repel = T, pt.size = 2) +
-    DimPlot(sc_fib_2, group.by = "orig.ident", shuffle = TRUE, raster = TRUE, repel = T, pt.size = 2) # save
+    DimPlot(sc_fib_2, group.by = "orig.ident", shuffle = TRUE, raster = TRUE, repel = T, pt.size = 2)
 
 sc_stromal$CellType_tmp <- NA_character_
 sc_stromal$CellType_tmp[sc_stromal$SCT_snn_res.0.3_rename == "Adipocyte"] <- "Adipocyte"
@@ -459,13 +451,11 @@ sc_stromal$CellType_tmp[names(fib2_map)] <- fib2_map
 # Sublining-layer fibroblast-APOE+CXCL12+        Sublining-layer fibroblast-COMP+  Sublining-layer fibroblast-MFAP5+PI16+ 
 #                                    8571                                    4590                                   16152
 
-# saveRDS(sc_fib, "02_Publicdata/ver6/Stromal/seuratObj_Fibro_20251022.rds")
-# saveRDS(sc_fib_2, "02_Publicdata/ver6/Stromal/seuratObj_Fibro_remove_doublet_20251022.rds")
-# saveRDS(sc_stromal, "02_Publicdata/ver6/tmp/seuratObj_stromal_20251022_update.rds")
+saveRDS(sc_stromal, "02_Publicdata/rds/seuratObj_stromal_20251022_update.rds")
 
 
 # Myeloid cell
-sc_myeloid <- readRDS("02_Publicdata/ver6/tmp/seuratObj_myeloid_20251022.rds")
+sc_myeloid <- readRDS("02_Publicdata/rds/seuratObj_myeloid_20251022.rds")
 
 sc_myeloid
 # An object of class Seurat 
@@ -516,7 +506,7 @@ sc_MonoMacroDC_dim30 <- FindClusters(sc_MonoMacroDC_dim30, resolution = 0.3)
 
 DimPlot(sc_MonoMacroDC_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_MonoMacroDC_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
-    DimPlot(sc_MonoMacroDC_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_MonoMacroDC_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 DimPlot(sc_MonoMacroDC_dim10, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_MonoMacroDC_dim20, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_MonoMacroDC_dim30, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2)
@@ -528,13 +518,13 @@ sc_MonoMacroDC <- sc_MonoMacroDC_dim10
 
 DimPlot(sc_MonoMacroDC, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_MonoMacroDC, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_MonoMacroDC, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_MonoMacroDC, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 sc_MonoMacroDC <- SetIdent(sc_MonoMacroDC, value = "SCT_snn_res.0.2")
 
 DimPlot(sc_MonoMacroDC, split.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 3)
-FeaturePlot(sc_MonoMacroDC, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3) # save
-FeaturePlot(sc_MonoMacroDC, raster = T, features = c("HLA-DRA","CD68","ADGRE1","MRC1","CX3CR1","CD14","FCGR3A","CCR2","CD1A","CD1C","ITGAX","ITGAM","ANPEP","CD33"), pt.size = 3) # save
+FeaturePlot(sc_MonoMacroDC, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
+FeaturePlot(sc_MonoMacroDC, raster = T, features = c("HLA-DRA","CD68","ADGRE1","MRC1","CX3CR1","CD14","FCGR3A","CCR2","CD1A","CD1C","ITGAX","ITGAM","ANPEP","CD33"), pt.size = 3)
 
 sc_MonoMacroDC <- PrepSCTFindMarkers(sc_MonoMacroDC)
 all.markers <- FindAllMarkers(sc_MonoMacroDC, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -546,7 +536,7 @@ all.markers_top30 <- all.markers %>%
     top_n(n = 30, wt = avg_log2FC)
 
 DotPlot(sc_MonoMacroDC, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_MonoMacroDC <- RenameIdents(sc_MonoMacroDC, "0"="Macrophage")
 sc_MonoMacroDC <- RenameIdents(sc_MonoMacroDC, "1"="Macrophage")
@@ -560,7 +550,7 @@ table(sc_MonoMacroDC@active.ident)
 #    Doublet Macrophage    Mono/DC 
 #       1421      22705       2739 
 
-DimPlot(sc_MonoMacroDC, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+DimPlot(sc_MonoMacroDC, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 
 sc_MonoMacroDC_2 <- subset(sc_MonoMacroDC, idents = c("Macrophage","Mono/DC"))
@@ -605,7 +595,7 @@ sc_MonoMacroDC_2_dim10 <- FindClusters(sc_MonoMacroDC_2_dim10, resolution = 0.6)
 sc_MonoMacroDC_2_dim20 <- FindClusters(sc_MonoMacroDC_2_dim20, resolution = 0.6)
 
 DimPlot(sc_MonoMacroDC_2_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_MonoMacroDC_2_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_MonoMacroDC_2_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 FeaturePlot(sc_MonoMacroDC_2_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_MonoMacroDC_2_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 
@@ -619,14 +609,14 @@ DimPlot(sc_MonoMacroDC_2, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster =
     DimPlot(sc_MonoMacroDC_2, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_MonoMacroDC_2, group.by = "SCT_snn_res.0.4", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_MonoMacroDC_2, group.by = "SCT_snn_res.0.5", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_MonoMacroDC_2, group.by = "SCT_snn_res.0.6", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_MonoMacroDC_2, group.by = "SCT_snn_res.0.6", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
-FeaturePlot(sc_MonoMacroDC_2, raster = T, features = c("HLA-DRA","CD68","NOS2","MRC1","MERTK","CX3CR1","TIMD4","CD14","FCGR3A","CCR2","CD1A","CD1C","ITGAX","ITGAM","ANPEP","CD33"), pt.size = 3) # save
+FeaturePlot(sc_MonoMacroDC_2, raster = T, features = c("HLA-DRA","CD68","NOS2","MRC1","MERTK","CX3CR1","TIMD4","CD14","FCGR3A","CCR2","CD1A","CD1C","ITGAX","ITGAM","ANPEP","CD33"), pt.size = 3)
 
 sc_MonoMacroDC_2 <- SetIdent(sc_MonoMacroDC_2, value = "SCT_snn_res.0.1")
 
 DotPlot(sc_MonoMacroDC_2, features = c("HLA-DRA","CD68","NOS2","MRC1","MERTK","CX3CR1","TIMD4","CD14","FCGR3A","CCR2","CD1A","CD1C","ITGAX","ITGAM","ANPEP","CD33")) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_MonoMacroDC_2 <- PrepSCTFindMarkers(sc_MonoMacroDC_2)
 all.markers <- FindAllMarkers(sc_MonoMacroDC_2, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -645,13 +635,10 @@ sc_MonoMacroDC_2 <- ScaleData(sc_MonoMacroDC_2)
 DefaultAssay(sc_MonoMacroDC_2) <- "SCT"
 sc_MonoMacroDC_2 <- JoinLayers(sc_MonoMacroDC_2, assay = "RNA")
 
-DoHeatmap(sc_MonoMacroDC_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_MonoMacroDC_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_MonoMacroDC_2, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Myeloid/all.markers_Myeloid_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Myeloid/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Myeloid/top30.txt", sep = "\t")
 
 sc_MonoMacroDC_2 <- RenameIdents(sc_MonoMacroDC_2, "0"="Macrophage")
 sc_MonoMacroDC_2 <- RenameIdents(sc_MonoMacroDC_2, "1"="Macrophage")
@@ -696,7 +683,7 @@ sc_DC_dim10 <- FindClusters(sc_DC_dim10, resolution = 0.4)
 sc_DC_dim20 <- FindClusters(sc_DC_dim20, resolution = 0.4)
 
 DimPlot(sc_DC_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) + 
-    DimPlot(sc_DC_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) # save
+    DimPlot(sc_DC_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3)
 FeaturePlot(sc_DC_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_DC_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 
@@ -708,14 +695,14 @@ sc_DC <- sc_DC_dim20
 DimPlot(sc_DC, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) + 
     DimPlot(sc_DC, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) + 
     DimPlot(sc_DC, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) +
-    DimPlot(sc_DC, group.by = "SCT_snn_res.0.4", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3)  # save
+    DimPlot(sc_DC, group.by = "SCT_snn_res.0.4", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3)
 
 FeaturePlot(sc_DC, raster = T, features = c("HLA-DRA","CD68","NOS2","MRC1","MERTK","CX3CR1","TIMD4","CD14","FCGR3A","CCR2","CD1A","CD1C","ITGAX","ITGAM","ANPEP","CD33"), pt.size = 3)
 
 sc_DC <- SetIdent(sc_DC, value = "SCT_snn_res.0.4")
 
 DotPlot(sc_DC, features = c("HLA-DRA","CD68","MRC1","MERTK","CX3CR1","TIMD4","CD14","FCGR3A","CCR2","CD1A","CD1C","ITGAX","ITGAM","ANPEP","CD33")) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_DC <- PrepSCTFindMarkers(sc_DC)
 all.markers <- FindAllMarkers(sc_DC, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -734,13 +721,10 @@ sc_DC <- ScaleData(sc_DC)
 DefaultAssay(sc_DC) <- "SCT"
 sc_DC <- JoinLayers(sc_DC, assay = "RNA")
 
-DoHeatmap(sc_DC, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_DC, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_DC, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Myeloid/DC/all.markers_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Myeloid/DC/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Myeloid/DC/top30.txt", sep = "\t")
 
 sc_DC <- RenameIdents(sc_DC, "0"="cDC2")
 sc_DC <- RenameIdents(sc_DC, "1"="Monocyte-Classical")
@@ -758,13 +742,10 @@ all.markers_top30 <- all.markers %>%
     group_by(cluster) %>%
     top_n(n = 30, wt = avg_log2FC)
 
-DoHeatmap(sc_DC, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_DC, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_DC, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Myeloid/DC/all.markers_update_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Myeloid/DC/top10_update.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Myeloid/DC/top30_update.txt", sep = "\t")
 
 
 sc_Mac <- subset(sc_MonoMacroDC_2, idents = "Macrophage")
@@ -799,11 +780,9 @@ sc_Mac_dim10 <- FindClusters(sc_Mac_dim10, resolution = 0.2)
 sc_Mac_dim20 <- FindClusters(sc_Mac_dim20, resolution = 0.2)
 sc_Mac_dim10 <- FindClusters(sc_Mac_dim10, resolution = 0.3)
 sc_Mac_dim20 <- FindClusters(sc_Mac_dim20, resolution = 0.3)
-#sc_Mac_dim10 <- FindClusters(sc_Mac_dim10, resolution = 0.4)
-#sc_Mac_dim20 <- FindClusters(sc_Mac_dim20, resolution = 0.4)
 
 DimPlot(sc_Mac_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_Mac_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_Mac_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 FeaturePlot(sc_Mac_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_Mac_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 
@@ -814,14 +793,14 @@ sc_Mac <- sc_Mac_dim20
 
 DimPlot(sc_Mac, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_Mac, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_Mac, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_Mac, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 FeaturePlot(sc_Mac, raster = T, features = c("HLA-DRA","CD68","NOS2","MRC1","MERTK","TREM2","TIMD4","LYVE1","FOLR2","ISG15","CLEC10A","S100A12","SPP1"), pt.size = 3)
 
 sc_Mac <- SetIdent(sc_Mac, value = "SCT_snn_res.0.3")
 
 DotPlot(sc_Mac, features = c("HLA-DRA","CD68","NOS2","MRC1","MERTK","TREM2","TIMD4","LYVE1","FOLR2","ISG15","CLEC10A","S100A12","SPP1")) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_Mac <- PrepSCTFindMarkers(sc_Mac)
 all.markers <- FindAllMarkers(sc_Mac, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -840,13 +819,10 @@ sc_Mac <- ScaleData(sc_Mac)
 DefaultAssay(sc_Mac) <- "SCT"
 sc_Mac <- JoinLayers(sc_Mac, assay = "RNA")
 
-DoHeatmap(sc_Mac, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_Mac, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_Mac, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Myeloid/Macrophage/all.markers_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Myeloid/Macrophage/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Myeloid/Macrophage/top30.txt", sep = "\t")
 
 sc_Mac <- RenameIdents(sc_Mac, "0"="Macrophage-TIMD4+")
 sc_Mac <- RenameIdents(sc_Mac, "1"="Macrophage-Chemokine high")
@@ -866,13 +842,10 @@ all.markers_top30 <- all.markers %>%
     group_by(cluster) %>%
     top_n(n = 30, wt = avg_log2FC)
 
-DoHeatmap(sc_Mac, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_Mac, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_Mac, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Myeloid/Macrophage/all.markers_update_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Myeloid/Macrophage/top10_update.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Myeloid/Macrophage/top30_update.txt", sep = "\t")
 
 
 sc_gra <- subset(sc_myeloid, idents = "Granulocyte")
@@ -885,8 +858,8 @@ sc_gra <- RunPCA(sc_gra)
 sc_gra <- RunUMAP(sc_gra, dims = 1:10)
 sc_gra <- FindNeighbors(sc_gra, dims = 1:10)
 sc_gra <- FindClusters(sc_gra, resolution = 0.1)
-DimPlot(sc_gra) # save
-FeaturePlot(sc_gra, features = c("TPSAB1","FCER1A","KIT")) # save
+DimPlot(sc_gra)
+FeaturePlot(sc_gra, features = c("TPSAB1","FCER1A","KIT"))
 
 
 sc_myeloid$CellType_tmp <- NA_character_
@@ -905,16 +878,11 @@ table(sc_myeloid$CellType_tmp)
 #                 Mast cell        Monocyte-Classical              Monocyte-Int     Monocyte-nonClassical                    mregDC 
 #                       468                       505                       384                       110                       269 
 
-# saveRDS(sc_MonoMacroDC, "02_Publicdata/ver6/Myeloid/seuratObj_Myeloid_20251022.rds")
-# saveRDS(sc_MonoMacroDC_2, "02_Publicdata/ver6/Myeloid/seuratObj_Myeloid_remove_doublet_20251022.rds")
-# saveRDS(sc_DC, "02_Publicdata/ver6/Myeloid/seuratObj_Myeloid_DC_20251022.rds")
-# saveRDS(sc_Mac, "02_Publicdata/ver6/Myeloid/seuratObj_Myeloid_Macrophage_20251022.rds")
-# saveRDS(sc_gra, "02_Publicdata/ver6/tmp/seuratObj_Myeloid_granulocyte_20251022.rds")
-# saveRDS(sc_myeloid, "02_Publicdata/ver6/tmp/seuratObj_myeloid_20251022_update.rds")
+saveRDS(sc_myeloid, "02_Publicdata/rds/seuratObj_myeloid_20251022_update.rds")
 
 
 # Lymphoid cell
-sc_lymphoid <- readRDS("02_Publicdata/ver6/tmp/seuratObj_lymphoid_20251022.rds")
+sc_lymphoid <- readRDS("02_Publicdata/rds/seuratObj_lymphoid_20251022.rds")
 
 sc_lymphoid
 # An object of class Seurat 
@@ -954,7 +922,7 @@ sc_lymphoid_dim30 <- FindClusters(sc_lymphoid_dim30, resolution = 0.3)
 
 DimPlot(sc_lymphoid_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_lymphoid_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
-    DimPlot(sc_lymphoid_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_lymphoid_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 DimPlot(sc_lymphoid_dim10, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_lymphoid_dim20, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_lymphoid_dim30, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2)
@@ -966,13 +934,13 @@ sc_lymphoid <- sc_lymphoid_dim30
 
 DimPlot(sc_lymphoid, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_lymphoid, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_lymphoid, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_lymphoid, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 sc_lymphoid <- SetIdent(sc_lymphoid, value = "SCT_snn_res.0.3")
 
 DimPlot(sc_lymphoid, split.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 3)
-FeaturePlot(sc_lymphoid, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3) # save
-FeaturePlot(sc_lymphoid, raster = T, features = c("CD3E","CD4","CD8A","FOXP3","CD19","MS4A1","SDC1","TNFRSF17","IL3RA"), pt.size = 3) # save
+FeaturePlot(sc_lymphoid, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
+FeaturePlot(sc_lymphoid, raster = T, features = c("CD3E","CD4","CD8A","FOXP3","CD19","MS4A1","SDC1","TNFRSF17","IL3RA"), pt.size = 3)
 
 sc_lymphoid <- PrepSCTFindMarkers(sc_lymphoid)
 all.markers <- FindAllMarkers(sc_lymphoid, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -984,7 +952,7 @@ all.markers_top30 <- all.markers %>%
     top_n(n = 30, wt = avg_log2FC)
 
 DotPlot(sc_lymphoid, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_lymphoid <- RenameIdents(sc_lymphoid, "0"="T cell-nonTreg")
 sc_lymphoid <- RenameIdents(sc_lymphoid, "1"="T cell-nonTreg")
@@ -1003,7 +971,7 @@ table(sc_lymphoid@active.ident)
 #         Plasma           Treg            pDC        Doublet T cell-nonTreg         B cell 
 #            614             51             51            499           4819            377 
 
-DimPlot(sc_lymphoid, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+DimPlot(sc_lymphoid, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 
 sc_T_NK <- subset(sc_lymphoid, idents = "T cell-nonTreg")
@@ -1047,7 +1015,7 @@ sc_T_NK_dim30 <- FindClusters(sc_T_NK_dim30, resolution = 0.6)
 
 DimPlot(sc_T_NK_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_T_NK_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
-    DimPlot(sc_T_NK_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_T_NK_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 FeaturePlot(sc_T_NK_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_T_NK_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_T_NK_dim30, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
@@ -1063,14 +1031,14 @@ DimPlot(sc_T_NK, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, la
     DimPlot(sc_T_NK, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_T_NK, group.by = "SCT_snn_res.0.4", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_T_NK, group.by = "SCT_snn_res.0.5", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_T_NK, group.by = "SCT_snn_res.0.6", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_T_NK, group.by = "SCT_snn_res.0.6", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
-FeaturePlot(sc_T_NK, raster = T, features = c("CD3E","CD4","IFNG","IL4","IL9","IL17A","IL22","CXCR5","PDCD1","IL21","CXCL13","FOXP3","CD8A","PRF1","GZMB","NCAM1","FCGR3A","CCR7","SELL","CD69","IL2RA","ITGAE"), pt.size = 3) # save
+FeaturePlot(sc_T_NK, raster = T, features = c("CD3E","CD4","IFNG","IL4","IL9","IL17A","IL22","CXCR5","PDCD1","IL21","CXCL13","FOXP3","CD8A","PRF1","GZMB","NCAM1","FCGR3A","CCR7","SELL","CD69","IL2RA","ITGAE"), pt.size = 3)
 
 sc_T_NK <- SetIdent(sc_T_NK, value = "SCT_snn_res.0.5")
 
 DotPlot(sc_T_NK, features = c("CD3E","CD4","IFNG","IL4","IL21","CXCR5","PDCD1","CXCL13","FOXP3","CD8A","PRF1","GZMB","NCAM1","FCGR3A","CCR7","SELL","CD69","IL2RA","ITGAE")) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_T_NK <- PrepSCTFindMarkers(sc_T_NK)
 all.markers <- FindAllMarkers(sc_T_NK, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -1089,13 +1057,10 @@ sc_T_NK <- ScaleData(sc_T_NK)
 DefaultAssay(sc_T_NK) <- "SCT"
 sc_T_NK <- JoinLayers(sc_T_NK, assay = "RNA")
 
-DoHeatmap(sc_T_NK, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_T_NK, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_T_NK, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Lymphoid/T_NK/all.markers_T_NK_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Lymphoid/T_NK/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Lymphoid/T_NK/top30.txt", sep = "\t")
 
 sc_T_NK <- RenameIdents(sc_T_NK, "0"="CD4 T")
 sc_T_NK <- RenameIdents(sc_T_NK, "1"="CD8 T")
@@ -1131,7 +1096,7 @@ sc_NK_dim10 <- FindClusters(sc_NK_dim10, resolution = 0.3)
 sc_NK_dim20 <- FindClusters(sc_NK_dim20, resolution = 0.3)
 
 DimPlot(sc_NK_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) + 
-    DimPlot(sc_NK_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) # save
+    DimPlot(sc_NK_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3)
 FeaturePlot(sc_NK_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_NK_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_NK_dim10, raster = T, features = c("CD52","KLRC2","CCL5","IL32","VIM","GZMK","SELL","EIF3G","CD44","GAS5","XCL2","TPT1","EEF1A1","IL7R","CXCR4","IER2","KLRB1","ACTB","ACTG1","CORO1A","RNF213","NCL","NEAT1","C1orf56","TXNIP"), pt.size = 5)
@@ -1141,7 +1106,7 @@ sc_NK <- sc_NK_dim10
 
 DimPlot(sc_NK, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) + 
     DimPlot(sc_NK, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) + 
-    DimPlot(sc_NK, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3) # save
+    DimPlot(sc_NK, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 3)
 
 FeaturePlot(sc_NK_dim10, raster = T, features = c("CD52","KLRC2","CCL5","IL32","VIM","GZMK","SELL","EIF3G","CD44","GAS5","XCL2","TPT1","EEF1A1","IL7R","CXCR4","IER2","KLRB1","ACTB","ACTG1","CORO1A","RNF213","NCL","NEAT1","C1orf56","TXNIP"), pt.size = 5)
 
@@ -1151,7 +1116,7 @@ DotPlot(sc_NK, features = c("CD3E","CD4","IFNG","IL21","CXCR5","PDCD1","CD8A","P
     RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 DotPlot(sc_NK, features = c("CD52","KLRC2","CCL5","IL32","VIM","GZMK","SELL","EIF3G","CD44","GAS5","XCL2","TPT1","EEF1A1","IL7R","CXCR4","IER2","KLRB1","ACTB","ACTG1","CORO1A","RNF213","NCL","NEAT1","C1orf56","TXNIP")) +  # Genes reported in "https://www.nature.com/articles/s41590-024-01883-0/figures/2".
-RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 
 sc_NK <- PrepSCTFindMarkers(sc_NK)
@@ -1169,13 +1134,10 @@ sc_NK <- FindVariableFeatures(sc_NK)
 sc_NK <- ScaleData(sc_NK)
 DefaultAssay(sc_NK) <- "SCT"
 
-DoHeatmap(sc_NK, features = all.markers_top10$gene, size = 3.5) + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_NK, features = all.markers_top10$gene, size = 3.5) + scale_fill_gradientn(colors = colors)
 DotPlot(sc_NK, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Lymphoid/T_NK/NK/all.markers_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Lymphoid/T_NK/NK/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Lymphoid/T_NK/NK/top30.txt", sep = "\t")
 
 sc_NK <- RenameIdents(sc_NK, "0"="NK cell-3")
 sc_NK <- RenameIdents(sc_NK, "1"="NK cell-1")
@@ -1223,7 +1185,7 @@ sc_T_dim30 <- FindClusters(sc_T_dim30, resolution = 0.6)
 
 DimPlot(sc_T_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_T_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
-    DimPlot(sc_T_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)  # save
+    DimPlot(sc_T_dim30, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 FeaturePlot(sc_T_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_T_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_T_dim30, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
@@ -1243,7 +1205,7 @@ DimPlot(sc_T, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label
     DimPlot(sc_T, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_T, group.by = "SCT_snn_res.0.4", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_T, group.by = "SCT_snn_res.0.5", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_T, group.by = "SCT_snn_res.0.6", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_T, group.by = "SCT_snn_res.0.6", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 FeaturePlot(sc_T, raster = T, features = c("CD4","ANXA1","GATA3","PLP2","CRIP2","TIMP1","S100A10","IL7R","AQP3","TCF7","KLRB1","RORA","TSHZ2","IFI44L","ITGB1","ANK3","ZBTB16","TXK","PCNX1","IL17A","CCL4","HLA-DRB1","CD69","CCR7"), pt.size = 3)
 FeaturePlot(sc_T, raster = T, features = c(,"CCR7","SELL","LEF1","TCF7","IL7R","ANXA1","CD69","ITGAE","GZMK","GZMB","PRF1","GNLY","CX3CR1","CCL5","TBX21","ZNF683","IKZF2","IKZF3","KLRC2"), pt.size = 3)
@@ -1251,7 +1213,7 @@ FeaturePlot(sc_T, raster = T, features = c(,"CCR7","SELL","LEF1","TCF7","IL7R","
 sc_T <- SetIdent(sc_T, value = "SCT_snn_res.0.5")
 
 DotPlot(sc_T, features = c("CD4","ANXA1","GATA3","PLP2","CRIP2","TIMP1","S100A10","IL7R","AQP3","TCF7","KLRB1","RORA","TSHZ2","IFI44L","ITGB1","ANK3","ZBTB16","TXK","PCNX1","IL17A","CCL4","HLA-DRB1","CD69","ITGAE","CCR7","SELL","LEF1","CD8A","GZMK","GZMB","PRF1","GNLY","CX3CR1","CCL5","TBX21","ZNF683","IKZF2","IKZF3","KLRC2")) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_T <- PrepSCTFindMarkers(sc_T)
 all.markers <- FindAllMarkers(sc_T, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -1270,13 +1232,10 @@ sc_T <- ScaleData(sc_T)
 DefaultAssay(sc_T) <- "SCT"
 sc_T <- JoinLayers(sc_T, assay = "RNA")
 
-DoHeatmap(sc_T, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_T, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_T, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Lymphoid/T_NK/T/all.markers_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Lymphoid/T_NK/T/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Lymphoid/T_NK/T/top30.txt", sep = "\t")
 
 sc_T <- RenameIdents(sc_T, "0"="CD4 T-Naive")
 sc_T <- RenameIdents(sc_T, "1"="CD8 T-ResidentMemory")
@@ -1306,15 +1265,11 @@ table(sc_lymphoid$CellType_tmp)
 #                  614                   51 
 
 
-# saveRDS(sc_lymphoid, "02_Publicdata/ver6/Lymphoid/seuratObj_Lymphoid_20251022.rds")
-# saveRDS(sc_T_NK, "02_Publicdata/ver6/Lymphoid/seuratObj_T_NK_20251022.rds")
-# saveRDS(sc_NK, "02_Publicdata/ver6/Lymphoid/NK/seuratObj_NK_20251022.rds")
-# saveRDS(sc_T, "02_Publicdata/ver6/Lymphoid/T/seuratObj_Tcell_20251022_latest.rds")
-# saveRDS(sc_lymphoid, "02_Publicdata/ver6/tmp/seuratObj_lymphoid_20251022_update.rds")
+saveRDS(sc_lymphoid, "02_Publicdata/rds/seuratObj_lymphoid_20251022_update.rds")
 
 
 # Endothelial cell
-sc_ec <- readRDS("02_Publicdata/ver6/tmp/seuratObj_endothelial_20251022.rds")
+sc_ec <- readRDS("02_Publicdata/rds/seuratObj_endothelial_20251022.rds")
 
 sc_ec 
 # An object of class Seurat 
@@ -1348,7 +1303,7 @@ sc_ec_dim10 <- FindClusters(sc_ec_dim10, resolution = 0.3)
 sc_ec_dim20 <- FindClusters(sc_ec_dim20, resolution = 0.3)
 
 DimPlot(sc_ec_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_ec_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_ec_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 DimPlot(sc_ec_dim10, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_ec_dim20, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2)
 FeaturePlot(sc_ec_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
@@ -1358,13 +1313,13 @@ sc_ec <- sc_ec_dim20
 
 DimPlot(sc_ec, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_ec, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_ec, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_ec, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 sc_ec <- SetIdent(sc_ec, value = "SCT_snn_res.0.3")
 
 DimPlot(sc_ec, split.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2)
-FeaturePlot(sc_ec, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3) # save
-FeaturePlot(sc_ec, raster = T, features = c("PECAM1","CDH5","VWF","SEMA3G","SOX17","RGCC","ACKR1","NR2F2","CCL21", "NOTCH4","SPARC","LIFR","ICAM1"), pt.size = 3) # save
+FeaturePlot(sc_ec, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
+FeaturePlot(sc_ec, raster = T, features = c("PECAM1","CDH5","VWF","SEMA3G","SOX17","RGCC","ACKR1","NR2F2","CCL21", "NOTCH4","SPARC","LIFR","ICAM1"), pt.size = 3)
 
 sc_ec <- PrepSCTFindMarkers(sc_ec)
 all.markers <- FindAllMarkers(sc_ec, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -1376,7 +1331,7 @@ all.markers_top30 <- all.markers %>%
     top_n(n = 30, wt = avg_log2FC)
 
 DotPlot(sc_ec, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_ec <- RenameIdents(sc_ec, "0"="ec")
 sc_ec <- RenameIdents(sc_ec, "1"="ec")
@@ -1420,7 +1375,7 @@ sc_ec_2_dim10 <- FindClusters(sc_ec_2_dim10, resolution = 0.3)
 sc_ec_2_dim20 <- FindClusters(sc_ec_2_dim20, resolution = 0.3)
 
 DimPlot(sc_ec_2_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_ec_2_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_ec_2_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 FeaturePlot(sc_ec_2_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 FeaturePlot(sc_ec_2_dim20, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
 
@@ -1431,14 +1386,14 @@ sc_ec_2 <- sc_ec_2_dim20
 
 DimPlot(sc_ec_2, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_ec_2, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_ec_2, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_ec_2, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
-FeaturePlot(sc_ec_2, raster = T, features = c("PECAM1","CDH5","VWF","SEMA3G","SOX17","RGCC","ACKR1","NR2F2","CCL21", "NOTCH4","SPARC","LIFR","ICAM1"), pt.size = 3) # save
+FeaturePlot(sc_ec_2, raster = T, features = c("PECAM1","CDH5","VWF","SEMA3G","SOX17","RGCC","ACKR1","NR2F2","CCL21", "NOTCH4","SPARC","LIFR","ICAM1"), pt.size = 3)
 
 sc_ec_2 <- SetIdent(sc_ec_2, value = "SCT_snn_res.0.2")
 
 DotPlot(sc_ec_2, features = c("CCL21","ACKR1","NR2F2","SEMA3G","NOTCH4","RGCC")) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_ec_2 <- PrepSCTFindMarkers(sc_ec_2)
 all.markers <- FindAllMarkers(sc_ec_2, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -1457,13 +1412,10 @@ sc_ec_2 <- ScaleData(sc_ec_2)
 DefaultAssay(sc_ec_2) <- "SCT"
 sc_ec_2 <- JoinLayers(sc_ec_2, assay = "RNA")
 
-DoHeatmap(sc_ec_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_ec_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_ec_2, features = all.markers_top10$gene) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Endothelial/all.markers_endothelial_remove_doublet_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Endothelial/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Endothelial/top30.txt", sep = "\t")
 
 sc_ec_2 <- RenameIdents(sc_ec_2, "0"="Venous EC-1")
 sc_ec_2 <- RenameIdents(sc_ec_2, "1"="Capillary EC-1")
@@ -1481,13 +1433,10 @@ all.markers_top30 <- all.markers %>%
     group_by(cluster) %>%
     top_n(n = 30, wt = avg_log2FC)
 
-DoHeatmap(sc_ec_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_ec_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_ec_2, features = all.markers_top10$gene) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Endothelial/all.markers_endothelial_remove_doublet_update_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Endothelial/top10_update.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Endothelial/top30_update.txt", sep = "\t")
 
 
 sc_ec$CellType_tmp <- NA_character_
@@ -1499,12 +1448,11 @@ table(sc_ec$CellType_tmp)
 #    Arterial EC Capillary EC-1 Capillary EC-2        Doublet   Lymphatic EC    Venous EC-1    Venous EC-2 
 #            672           1874            498            583            217           5496            836
 
-# saveRDS(sc_ec_2, "02_Publicdata/ver6/Endothelial/seuratObj_endothelial_remove_doublet_20251022.rds")
-# saveRDS(sc_ec, "02_Publicdata/ver6/tmp/seuratObj_endothelial_20251022_update.rds")
+saveRDS(sc_ec, "02_Publicdata/rds/seuratObj_endothelial_20251022_update.rds")
 
 
 # Mural cell
-sc_mural <- readRDS("02_Publicdata/ver6/tmp/seuratObj_mural_20251022.rds")
+sc_mural <- readRDS("02_Publicdata/rds/seuratObj_mural_20251022.rds")
 
 sc_mural 
 # An object of class Seurat 
@@ -1538,7 +1486,7 @@ sc_mural_dim10 <- FindClusters(sc_mural_dim10, resolution = 0.3)
 sc_mural_dim20 <- FindClusters(sc_mural_dim20, resolution = 0.3)
 
 DimPlot(sc_mural_dim10, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_mural_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_mural_dim20, shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 DimPlot(sc_mural_dim10, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_mural_dim20, group.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2)
 FeaturePlot(sc_mural_dim10, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
@@ -1548,13 +1496,13 @@ sc_mural <- sc_mural_dim10
 
 DimPlot(sc_mural, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) +
     DimPlot(sc_mural, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_mural, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_mural, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
 sc_mural <- SetIdent(sc_mural, value = "SCT_snn_res.0.3")
 
 DimPlot(sc_mural, split.by = "orig.ident", shuffle = TRUE, raster = T, label = T, repel = T, pt.size = 2)
-FeaturePlot(sc_mural, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3) # save
-FeaturePlot(sc_mural, raster = T, features = c("PDGFRB","RGS5","ABCC9","KCNJ8","AGT","ACTA2","MYH11","RERGL","CASQ2","KCNAB1","HMCN2","FLNC"), pt.size = 3) # save
+FeaturePlot(sc_mural, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTPRC","CD68","CD3D","MS4A1"), pt.size = 3)
+FeaturePlot(sc_mural, raster = T, features = c("PDGFRB","RGS5","ABCC9","KCNJ8","AGT","ACTA2","MYH11","RERGL","CASQ2","KCNAB1","HMCN2","FLNC"), pt.size = 3)
 
 sc_mural <- PrepSCTFindMarkers(sc_mural)
 all.markers <- FindAllMarkers(sc_mural, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -1566,7 +1514,7 @@ all.markers_top30 <- all.markers %>%
     top_n(n = 30, wt = avg_log2FC)
 
 DotPlot(sc_mural, features = unique(all.markers_top10$gene)) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_mural <- RenameIdents(sc_mural, "0"="mural")
 sc_mural <- RenameIdents(sc_mural, "1"="mural")
@@ -1600,14 +1548,14 @@ FeaturePlot(sc_mural_2, raster = T, features = c("PDGFRA","PDGFRB","PECAM1","PTP
 
 DimPlot(sc_mural_2, group.by = "SCT_snn_res.0.1", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
     DimPlot(sc_mural_2, group.by = "SCT_snn_res.0.2", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) + 
-    DimPlot(sc_mural_2, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2) # save
+    DimPlot(sc_mural_2, group.by = "SCT_snn_res.0.3", shuffle = TRUE, raster = TRUE, label = T, repel = T, pt.size = 2)
 
-FeaturePlot(sc_mural_2, raster = T, features = c("PDGFRB","RGS5","ABCC9","KCNJ8","AGT","ACTA2","MYH11","RERGL","CASQ2","KCNAB1","HMCN2","FLNC"), pt.size = 3) # save
+FeaturePlot(sc_mural_2, raster = T, features = c("PDGFRB","RGS5","ABCC9","KCNJ8","AGT","ACTA2","MYH11","RERGL","CASQ2","KCNAB1","HMCN2","FLNC"), pt.size = 3)
 
 sc_mural_2 <- SetIdent(sc_mural_2, value = "SCT_snn_res.0.2")
 
 DotPlot(sc_mural_2, features = c("PDGFRB","RGS5","ABCC9","KCNJ8","AGT","ACTA2","MYH11","RERGL","CASQ2","KCNAB1","HMCN2","FLNC"), cluster.idents = TRUE) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_mural_2 <- PrepSCTFindMarkers(sc_mural_2)
 all.markers <- FindAllMarkers(sc_mural_2, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5)
@@ -1626,17 +1574,14 @@ sc_mural_2 <- ScaleData(sc_mural_2)
 DefaultAssay(sc_mural_2) <- "SCT"
 sc_mural_2 <- JoinLayers(sc_mural_2, assay = "RNA")
 
-DoHeatmap(sc_mural_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors) # save
+DoHeatmap(sc_mural_2, features = all.markers_top10$gene, size = 3.5, assay = "RNA", slot = "scale.data") + scale_fill_gradientn(colors = colors)
 DotPlot(sc_mural_2, features = all.markers_top10$gene, cluster.idents = TRUE) + 
-    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred") # save
+    RotatedAxis() + scale_color_gradient(low = "lightgrey", high = "darkred")
 
 sc_mural_2 <- RenameIdents(sc_mural_2, "0"="Pericyte")
 sc_mural_2 <- RenameIdents(sc_mural_2, "1"="VSMC-1")
 sc_mural_2 <- RenameIdents(sc_mural_2, "2"="VSMC-2")
 
-# saveRDS(all.markers, "02_Publicdata/ver6/Mural/all.markers_mural_remove_doublet_20251022.rds")
-# write.table(all.markers_top10, "02_Publicdata/ver6/Mural/top10.txt", sep = "\t")
-# write.table(all.markers_top30, "02_Publicdata/ver6/Mural/top30.txt", sep = "\t")
 
 
 sc_mural$CellType_tmp <- NA_character_
@@ -1648,18 +1593,17 @@ table(sc_mural$CellType_tmp)
 #  Doublet Pericyte   VSMC-1   VSMC-2 
 #     1034     2695     2359      953 
 
-# saveRDS(sc_mural_2, "02_Publicdata/ver6/Mural/seuratObj_mural_remove_doublet_20251022.rds")
-# saveRDS(sc_mural, "02_Publicdata/ver6/tmp/seuratObj_mural_20251022_update.rds")
+saveRDS(sc_mural, "02_Publicdata/rds/seuratObj_mural_20251022_update.rds")
 
 
 
 # Integration of annotations and downstream analyses *****
-sc <- readRDS("02_Publicdata/ver6/tmp/seuratObj_after_rename_20251022.rds")
-sc_stromal <- readRDS("02_Publicdata/ver6/tmp/seuratObj_stromal_20251022_update.rds")
-sc_myeloid <- readRDS("02_Publicdata/ver6/tmp/seuratObj_myeloid_20251022_update.rds")
-sc_lymphoid <- readRDS("02_Publicdata/ver6/tmp/seuratObj_lymphoid_20251022_update.rds")
-sc_ec <- readRDS("02_Publicdata/ver6//tmp/seuratObj_endothelial_20251022_update.rds")
-sc_mural <- readRDS("02_Publicdata/ver6/tmp/seuratObj_mural_20251022_update.rds")
+sc <- readRDS("02_Publicdata/rds/seuratObj_after_rename_20251022.rds")
+sc_stromal <- readRDS("02_Publicdata/rds/seuratObj_stromal_20251022_update.rds")
+sc_myeloid <- readRDS("02_Publicdata/rds/seuratObj_myeloid_20251022_update.rds")
+sc_lymphoid <- readRDS("02_Publicdata/rds/seuratObj_lymphoid_20251022_update.rds")
+sc_ec <- readRDS("02_Publicdata/rds/seuratObj_endothelial_20251022_update.rds")
+sc_mural <- readRDS("02_Publicdata/rds/seuratObj_mural_20251022_update.rds")
 
 anno_map <- c(
   setNames(as.character(sc_stromal$CellType_tmp), colnames(sc_stromal)),
@@ -1776,9 +1720,9 @@ sc$CellType_Class3_tmp <- NULL
 
 DimPlot(sc, group.by = "CellType_Class1", shuffle = TRUE, raster = TRUE, label = T, repel = T) + 
     DimPlot(sc, group.by = "CellType_Class2", shuffle = TRUE, raster = TRUE, label = T, repel = T) + 
-    DimPlot(sc, group.by = "CellType_Class3", shuffle = TRUE, raster = TRUE, label = T, repel = T) # check
+    DimPlot(sc, group.by = "CellType_Class3", shuffle = TRUE, raster = TRUE, label = T, repel = T)
 
-# saveRDS(sc, "02_Publicdata/ver6/tmp/seuratObj_add_label_latest_20251027.rds")
+saveRDS(sc, "02_Publicdata/rds/seuratObj_add_label_latest_20251027.rds")
 
 
 sc_nonDoublet <- sc
@@ -1827,79 +1771,7 @@ cluster_colors <- c(
 )
 
 
-# p_class1 <- DimPlot(sc_nonDoublet, group.by = "CellType_Class1", shuffle = TRUE, raster = TRUE) +
-#   labs(title = "", x = "", y = "") +
-#   theme_classic() +
-#   theme(
-#     plot.title = element_blank(),
-#     panel.border = element_blank(),
-#     axis.ticks.x = element_blank(),
-#     axis.ticks.y = element_blank(),
-#     axis.line = element_blank(),
-#     axis.title.x = element_blank(),
-#     axis.text.x  = element_blank(),
-#     axis.title.y = element_blank(),
-#     axis.text.y = element_blank(),
-#     legend.title = element_text(size = 5),
-#     legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
-#     legend.key.size  = unit(2, "mm"),
-#     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -4, unit = "mm"),
-#     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
-#   ) +
-#   guides(colour = guide_legend(
-#     override.aes = list(size = 1)
-#   ))
-# p_class2 <- DimPlot(sc_nonDoublet, group.by = "CellType_Class2", shuffle = TRUE, raster = TRUE) +
-#   labs(title = "", x = "UMAP 1", y = "UMAP2") +
-#   theme_classic() +
-#   theme(
-#     plot.title = element_blank(),
-#     panel.border = element_blank(),
-#     axis.ticks.x = element_blank(),
-#     axis.ticks.y = element_blank(),
-#     axis.line = element_blank(),
-#     axis.title.x = element_blank(),
-#     axis.text.x  = element_blank(),
-#     axis.title.y = element_blank(),
-#     axis.text.y = element_blank(),
-#     legend.title = element_text(size = 5),
-#     legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
-#     legend.key.size  = unit(2, "mm"),
-#     legend.box.margin = margin(t = 0, r = 0, b = -1, l = -4, unit = "mm"),
-#     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
-#   ) +
-#   guides(colour = guide_legend(
-#     override.aes = list(size = 1)
-#   ))
-# p_class3 <- DimPlot(sc_nonDoublet, group.by = "CellType_Class3", shuffle = TRUE, raster = TRUE) +
-#   labs(title = "", x = "UMAP 1", y = "UMAP2") +
-#   theme_classic() +
-#   theme(
-#     plot.title = element_blank(),
-#     panel.border = element_blank(),
-#     axis.ticks.x = element_blank(),
-#     axis.ticks.y = element_blank(),
-#     axis.line = element_blank(),
-#     axis.title.x = element_blank(),
-#     axis.text.x  = element_blank(),
-#     axis.title.y = element_blank(),
-#     axis.text.y = element_blank(),
-#     legend.title = element_text(size = 5),
-#     legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
-#     legend.key.size  = unit(2, "mm"),
-#     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -4, unit = "mm"),
-#     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm")
-#   ) +
-#   guides(colour = guide_legend(
-#     override.aes = list(size = 1)
-#   ))
-# 
-# p_UMAP <- p_class1 + p_class2 + p_class3 &
-#   theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "mm"))
-# ggsave("02_Publicdata/ver6/All/after/Dim_Class_comparison_nonDoublet.png", plot = p_UMAP, height = 1.5, width = 9)
-# ggsave("02_Publicdata/ver6/All/after/Dim_Class_comparison_nonDoublet.pdf", plot = p_UMAP, height = 1.5, width = 9)
-
-p_class2_v2 <- DimPlot(sc_nonDoublet, cols = cluster_colors, group.by = "CellType_Class2", shuffle = TRUE, raster = TRUE) +
+p_class2 <- DimPlot(sc_nonDoublet, cols = cluster_colors, group.by = "CellType_Class2", shuffle = TRUE, raster = TRUE) +
   labs(title = "", x = "UMAP 1", y = "UMAP2") +
   theme_classic() +
   theme(
@@ -1921,8 +1793,8 @@ p_class2_v2 <- DimPlot(sc_nonDoublet, cols = cluster_colors, group.by = "CellTyp
   guides(colour = guide_legend(
     override.aes = list(size = 1)
   ))
-ggsave("99_Fig/sup_fig9/Dim_Class2.png", plot = p_class2_v2, height = 1.5, width = 2.5)
-ggsave("99_Fig/sup_fig9/Dim_Class2.pdf", plot = p_class2_v2, height = 1.5, width = 2.5)
+ggsave("99_Fig/sup_fig9/Dim_Class2.png", plot = p_class2, height = 1.5, width = 2.5)
+ggsave("99_Fig/sup_fig9/Dim_Class2.pdf", plot = p_class2, height = 1.5, width = 2.5)
 
 meta <- sc_nonDoublet@meta.data
 df_stacked_bar_class1 <- meta %>% 
@@ -1932,82 +1804,7 @@ df_stacked_bar_class2 <- meta %>%
 df_stacked_bar_class3 <- meta %>% 
   count(orig.ident, CellType_Class3)
 
-# p_stacked_bar_class1 <- ggplot(df_stacked_bar_class1, aes(x = orig.ident, y = n, fill = CellType_Class1)) +
-#   geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.85) +
-#   labs(y = "Fraction of cell type", fill = "Cell type") +
-#   scale_y_continuous(labels = function(x) x * 100) +
-#   theme_classic() +
-#   theme(
-#     plot.title = element_blank(),
-#     panel.border = element_blank(),
-#     axis.ticks.x = element_line(linewidth = 0.1),
-#     axis.ticks.y = element_line(linewidth = 0.1),
-#     axis.line = element_line(linewidth = 0.1),
-#     axis.title.x = element_blank(),
-#     axis.text.x  = element_text(, size = 5, angle = 45, hjust = 1),
-#     axis.title.y = element_text(size = 6, margin = margin(r = 0, unit = "mm") ),
-#     axis.text.y  = element_text(size = 5),
-#     legend.title = element_text(size = 5, margin = margin(b = 2)),
-#     legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
-#     legend.key.size = unit(2, "mm"),
-#     legend.margin = margin(t = -1, b = -1, unit = "mm"),
-#     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -4, unit = "mm"),
-#     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
-#   )
-# ggsave("02_Publicdata/ver6/All/after/Stacked_Class1_nonDoublet.png", p_stacked_bar_class1, height = 1.5, width = 2.5)
-# ggsave("02_Publicdata/ver6/All/after/Stacked_Class1_nonDoublet.pdf", p_stacked_bar_class1, height = 1.5, width = 2.5)
-# 
-# p_stacked_bar_class2 <- ggplot(df_stacked_bar_class2, aes(x = orig.ident, y = n, fill = CellType_Class2)) +
-#   geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.85) +
-#   labs(y = "Fraction of cell type", fill = "Cell type") +
-#   scale_y_continuous(labels = function(x) x * 100) +
-#   theme_classic() +
-#   theme(
-#     plot.title = element_blank(),
-#     panel.border = element_blank(),
-#     axis.ticks.x = element_line(linewidth = 0.1),
-#     axis.ticks.y = element_line(linewidth = 0.1),
-#     axis.line = element_line(linewidth = 0.1),
-#     axis.title.x = element_blank(),
-#     axis.text.x  = element_text(, size = 5, angle = 45, hjust = 1),
-#     axis.title.y = element_text(size = 6, margin = margin(r = 0, unit = "mm") ),
-#     axis.text.y  = element_text(size = 5),
-#     legend.title = element_text(size = 5, margin = margin(b = 2)),
-#     legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
-#     legend.key.size = unit(2, "mm"),
-#     legend.margin = margin(t = -1, b = -1, unit = "mm"),
-#     legend.box.margin = margin(t = 0, r = 0, b = -7.5, l = -4, unit = "mm"),
-#     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
-#   )
-# ggsave("02_Publicdata/ver6/All/after/Stacked_Class2_nonDoublet.png", p_stacked_bar_class2, height = 1.5, width = 2.8)
-# ggsave("02_Publicdata/ver6/All/after/Stacked_Class2_nonDoublet.pdf", p_stacked_bar_class2, height = 1.5, width = 2.8)
-# 
-# p_stacked_bar_class3 <- ggplot(df_stacked_bar_class3, aes(x = orig.ident, y = n, fill = CellType_Class3)) +
-#   geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.85) +
-#   labs(y = "Fraction of cell type", fill = "Cell type") +
-#   scale_y_continuous(labels = function(x) x * 100) +
-#   theme_classic() +
-#   theme(
-#     plot.title = element_blank(),
-#     panel.border = element_blank(),
-#     axis.ticks.x = element_line(linewidth = 0.1),
-#     axis.ticks.y = element_line(linewidth = 0.1),
-#     axis.line = element_line(linewidth = 0.1),
-#     axis.title.x = element_blank(),
-#     axis.text.x  = element_text(, size = 5, angle = 45, hjust = 1),
-#     axis.title.y = element_text(size = 6, margin = margin(r = 0, unit = "mm") ),
-#     axis.text.y  = element_text(size = 5),
-#     legend.title = element_text(size = 5, margin = margin(b = 2)),
-#     legend.text  = element_text(size = 5, margin = margin(l = 0.5, unit = "mm")),
-#     legend.key.size = unit(2, "mm"),
-#     legend.margin = margin(t = -1, b = -1, unit = "mm"),
-#     legend.box.margin = margin(t = 0, r = 0, b = -6, l = -4, unit = "mm"),
-#     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
-#   )
-# ggsave("02_Publicdata/ver6/All/after/Stacked_Class3_nonDoublet.png", p_stacked_bar_class3, height = 1.5, width = 5.55)
-# ggsave("02_Publicdata/ver6/All/after/Stacked_Class3_nonDoublet.pdf", p_stacked_bar_class3, height = 1.5, width = 5.55)
-
-p_stacked_bar_class2_v2 <- ggplot(df_stacked_bar_class2, aes(x = orig.ident, y = n, fill = CellType_Class2)) +
+p_stacked_bar_class2 <- ggplot(df_stacked_bar_class2, aes(x = orig.ident, y = n, fill = CellType_Class2)) +
   geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.85) +
   labs(y = "Fraction of cell type", fill = "Cell type") +
   scale_y_continuous(labels = function(x) x * 100) +
@@ -2030,8 +1827,8 @@ p_stacked_bar_class2_v2 <- ggplot(df_stacked_bar_class2, aes(x = orig.ident, y =
     legend.box.margin = margin(t = 0, r = 0, b = -7.5, l = -4, unit = "mm"),
     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
   )
-ggsave("99_Fig/sup_fig9/Stacked_Class2.png", p_stacked_bar_class2_v2, height = 1.5, width = 2.8)
-ggsave("99_Fig/sup_fig9/Stacked_Class2.pdf", p_stacked_bar_class2_v2, height = 1.5, width = 2.8)
+ggsave("99_Fig/sup_fig9/Stacked_Class2.png", p_stacked_bar_class2, height = 1.5, width = 2.8)
+ggsave("99_Fig/sup_fig9/Stacked_Class2.pdf", p_stacked_bar_class2, height = 1.5, width = 2.8)
 
 
 all.markers <- FindAllMarkers(sc_nonDoublet, assay = "SCT", only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5, recorrect_umi = FALSE)

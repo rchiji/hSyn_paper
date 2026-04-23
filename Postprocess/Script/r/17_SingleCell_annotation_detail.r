@@ -7,7 +7,7 @@ library(cowplot)
 
 options(future.globals.maxSize = 80 * 1024^3)
 
-sc <- readRDS("02_Publicdata/ver6/tmp/seuratObj_add_label_latest_20251027.rds")
+sc <- readRDS("02_Publicdata/rds/seuratObj_add_label_latest_20251027.rds")
 sc <- SetIdent(sc, value = "CellType_Class1")
 
 

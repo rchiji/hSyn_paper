@@ -10,7 +10,7 @@ library(clusterProfiler)
 library(ggplot2)
 library(pheatmap)
 
-df <- read.delim("01_formatted/annotations_full_tissue_count_thickness.txt", sep = "\t", row.names = 1)
+df <- read.delim("00_src/annotations_full.txt", sep = "\t", row.names = 1)
 data <- read.delim("01_formatted/gene_read_count_preprocessed.txt", sep = "\t", header = TRUE, row.names = 1)
 
 
@@ -90,8 +90,6 @@ MEs_avr <- MEList$averageExpr
 
 gene_module <- cbind(data_sd_5000, dynamicColors)
 
-# write.table(gene_module, "03_res/GeneExpression/wgcna_gene_module.txt", sep = "\t", row.names = T, col.names = NA)
-# write.table(MEs, "03_res/GeneExpression/wgcna_MEs.txt", sep = "\t", row.names = T, col.names = NA)
 
 
 ## Enrichment
@@ -114,7 +112,6 @@ for (color in module_colors) {
                                           TERM2GENE = msigdb_go[, c("gs_name", "gene_symbol")])
 }
 
-# saveRDS(enrichment_results_go, "03_res/GeneExpression/wgcna_gene_enrichment_go.rds")
 
 results_go <- lapply(enrichment_results_go, function(x) x@result)
 
@@ -194,7 +191,6 @@ for (color in module_colors) {
                                                    TERM2GENE = msigdb_celltype[, c("gs_name", "gene_symbol")])
 }
 
-# saveRDS(enrichment_results_celltype, "03_res/GeneExpression/wgcna_gene_enrichment_celltype.rds")
 
 results_celltype <- lapply(enrichment_results_celltype, function(x) x@result)
 
@@ -353,65 +349,6 @@ colnames(sig_mat) <- ifelse(colnames(sig_mat) %in% names(custom_labels_module),
                             custom_labels_module[colnames(sig_mat)], colnames(sig_mat))
 
 pdf("99_Fig/sup_fig4/Heatmap_cor_tissue_genemodule.pdf", width = 4.5, height = 3)
-pheatmap(cor_mat, 
-         cluster_rows = TRUE,
-         cluster_cols = TRUE,
-         color = colors,
-         show_rownames = TRUE,
-         show_colnames = TRUE,
-         clustering_method = "ward.D2",
-         display_numbers = sig_mat,
-         fontsize = 6
-)
-dev.off()
-
-
-### thickness, number
-df_thickness_number <- df_filtered %>%
-  select(Lining_thickness, Micro_vessel_ratio, Large_vessel_ratio, TLS_ratio)
-
-cor_mat <- cor(df_thickness_number, MEs_filtered, method = "spearman")
-
-p_mat <- matrix(NA,
-                nrow = nrow(cor_mat),
-                ncol = ncol(cor_mat),
-                dimnames = dimnames(cor_mat))
-
-for (i in 1:nrow(cor_mat)) {
-  for (j in 1:ncol(cor_mat)) {
-    p_mat[i, j] <- cor.test(df_thickness_number[, i],
-                            t(MEs_filtered)[j, ],
-                            method = "spearman",
-                            exact = FALSE)$p.value
-  }
-}
-
-padj_mat <- matrix(p.adjust(as.vector(p_mat), method = "BH"),
-                   nrow = nrow(p_mat),
-                   ncol = ncol(p_mat),
-                   dimnames = dimnames(p_mat))
-
-sig_mat <- matrix(
-  "",
-  nrow = nrow(padj_mat),
-  ncol = ncol(padj_mat),
-  dimnames = dimnames(padj_mat)
-)
-sig_mat[padj_mat < 0.05]  <- "*"
-sig_mat[padj_mat < 0.01]  <- "**"
-sig_mat[padj_mat < 0.001] <- "***"
-
-rownames(cor_mat) <- ifelse(rownames(cor_mat) %in% names(custom_labels_tissue),
-                            custom_labels_tissue[rownames(cor_mat)], rownames(cor_mat))
-rownames(sig_mat) <- ifelse(rownames(sig_mat) %in% names(custom_labels_tissue),
-                            custom_labels_tissue[rownames(sig_mat)], rownames(sig_mat))
-
-colnames(cor_mat) <- ifelse(colnames(cor_mat) %in% names(custom_labels_module),
-                            custom_labels_module[colnames(cor_mat)], colnames(cor_mat))
-colnames(sig_mat) <- ifelse(colnames(sig_mat) %in% names(custom_labels_module),
-                            custom_labels_module[colnames(sig_mat)], colnames(sig_mat))
-
-pdf("99_Fig/sup_fig4/Heatmap_cor_thickness_number_genemodule.pdf", width = 4.5, height = 3)
 pheatmap(cor_mat, 
          cluster_rows = TRUE,
          cluster_cols = TRUE,
