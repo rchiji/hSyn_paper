@@ -5,13 +5,12 @@ We developed a computational pathology framework to analyze hematoxylin and eosi
 1. Semantic segmentation of histological structures  
 2. Spatial analysis of tissue organization  
 3. Graph neural network–based modeling of microenvironmental interactions  
-4. Postprocessing for quantitative analysis and interpretation
 
 ---
 
 ## Module Description
 
-### hSyn HE WSI semantic segmentation
+### hSynovium H&E WSI semantic segmentation
 Directory: `HE_semantic_segmentation/`
 
 - Performs semantic segmentation of H&E-stained WSIs  
