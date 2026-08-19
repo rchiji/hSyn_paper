@@ -1,0 +1,33 @@
+[train] cases=67, tiles=2152, regions=246
+  total patch area = 685.4 mm^2
+  annotated (non-background) area = 306.3 mm^2
+    class1 Immune cells: 4,108,974 um^2 (0.60% of patch area)
+    class2 plasma: 620,044 um^2 (0.09% of patch area)
+    class3 Fibro(loose): 99,545,503 um^2 (14.52% of patch area)
+    class4 Fibro(dense,regular): 30,893,954 um^2 (4.51% of patch area)
+    class5 Fibro(dense,irregular): 65,599,565 um^2 (9.57% of patch area)
+    class6 lining: 7,342,784 um^2 (1.07% of patch area)
+    class7 vessel: 7,043,898 um^2 (1.03% of patch area)
+    class8 vessel(large): 10,280,762 um^2 (1.50% of patch area)
+    class9 adipose: 68,798,741 um^2 (10.04% of patch area)
+    class10 Stroma: 5,684,819 um^2 (0.83% of patch area)
+    class11 muscle: 2,740,730 um^2 (0.40% of patch area)
+    class12 RBC: 3,640,624 um^2 (0.53% of patch area)
+[val] cases=63, tiles=538, regions=190
+  total patch area = 171.4 mm^2
+  annotated (non-background) area = 72.7 mm^2
+    class1 Immune cells: 1,017,278 um^2 (0.59% of patch area)
+    class2 plasma: 215,673 um^2 (0.13% of patch area)
+    class3 Fibro(loose): 22,163,240 um^2 (12.93% of patch area)
+    class4 Fibro(dense,regular): 7,782,414 um^2 (4.54% of patch area)
+    class5 Fibro(dense,irregular): 15,670,751 um^2 (9.15% of patch area)
+    class6 lining: 1,592,787 um^2 (0.93% of patch area)
+    class7 vessel: 1,743,109 um^2 (1.02% of patch area)
+    class8 vessel(large): 2,048,388 um^2 (1.20% of patch area)
+    class9 adipose: 16,953,439 um^2 (9.89% of patch area)
+    class10 Stroma: 1,577,777 um^2 (0.92% of patch area)
+    class11 muscle: 821,154 um^2 (0.48% of patch area)
+    class12 RBC: 1,160,976 um^2 (0.68% of patch area)
+[overlap] shared cases = 63 (train-only: ['D005', 'D046', 'D058', 'D099'])
+[overlap] shared annotation regions = 187 / val regions 190
+[overlap] val tiles spatially covered by train-tile union: mean 85.8%, median 100.0%, fully covered 290/538, zero overlap 3/538
