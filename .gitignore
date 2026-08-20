@@ -5,7 +5,7 @@ misc/
 data/
 model_weights/
 tasks/
-scripts/
+HE_semantic_segmentation/scripts/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
