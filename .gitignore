@@ -4,6 +4,8 @@ misc/
 .history/
 data/
 model_weights/
+tasks/
+scripts/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
