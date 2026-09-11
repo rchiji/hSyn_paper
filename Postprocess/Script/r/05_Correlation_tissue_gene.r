@@ -81,7 +81,7 @@ rownames(cor_sig_2) <- ifelse(rownames(cor_sig_2) %in% names(custom_labels),
                         custom_labels[rownames(cor_sig_2)], rownames(cor_sig_2))
 colors <- colorRampPalette(c("#377EB8", "white", "#E41A1C"))(100)
 
-pdf("99_Fig/fig2/Heatmap_cor_tissue_gene.pdf", width = 12, height = 3)
+pdf("99_Fig/sup_fig4/Heatmap_cor_tissue_gene.pdf", width = 12, height = 3)
 pheatmap(cor_sig_2, 
          cluster_rows = TRUE,
          cluster_cols = TRUE,
@@ -122,8 +122,8 @@ p1 <- ggplot(df_gene_count, aes(x = tissue, y = n_genes)) +
     axis.title.y = element_blank(),
     axis.text.y = element_text(size = 6)
   )
-ggsave("99_Fig/fig2/Barplot_significant_gene_counts.png", plot = p1 , width = 3, height = 2)
-ggsave("99_Fig/fig2/Barplot_significant_gene_counts.pdf", plot = p1 , width = 3, height = 2)
+ggsave("99_Fig/sup_fig4/Barplot_significant_gene_counts.png", plot = p1 , width = 3, height = 2)
+ggsave("99_Fig/sup_fig4/Barplot_significant_gene_counts.pdf", plot = p1 , width = 3, height = 2)
 
 
 # Elastic net regression
@@ -193,6 +193,81 @@ p2 <- ggplot(df_res, aes(x = tissue, y = spearman_r)) +
     axis.title.y = element_blank(),
     axis.text.y = element_text(size = 6)
     )
-ggsave("99_Fig/fig2/Barplot_prediction_performance.png", plot = p2 , width = 3, height = 2)
-ggsave("99_Fig/fig2/Barplot_prediction_performance.pdf", plot = p2 , width = 3, height = 2)
+ggsave("99_Fig/sup_fig4/Barplot_prediction_performance.png", plot = p2 , width = 3, height = 2)
+ggsave("99_Fig/sup_fig4/Barplot_prediction_performance.pdf", plot = p2 , width = 3, height = 2)
+
+
+
+# For response to reviewers
+# case_split <- read.csv("00_src/case_split.csv", header = TRUE, row.names = 1)
+# 
+# case_train <- rownames(case_split)[case_split$n_train > 0]
+# case_nontrain <- rownames(case_split)[case_split$n_train == 0]
+# 
+# cohort_list <- list(
+#   Train = intersect(donor_keep, case_train),
+#   NonTrain = intersect(donor_keep, case_nontrain)
+# )
+# 
+# cor_list <- list()
+# 
+# for (cohort_name in names(cohort_list)) {
+#   donor_keep_cohort <- cohort_list[[cohort_name]]
+#   df_clr_cohort <- df_clr[donor_keep_cohort,]
+#   data_norm_cohort <- data_norm[,donor_keep_cohort]
+#   
+#   cor_mat <- cor(df_clr_cohort, t(data_norm_cohort), method = "spearman")
+#   cor_list[[cohort_name]] <- cor_mat
+# }
+# 
+# 
+# cor_train <- cor_list[["Train"]]
+# cor_nontrain <- cor_list[["NonTrain"]]
+# 
+# df_concordance <- data.frame(
+#   tissue = rep(rownames(cor_train), times = ncol(cor_train)),
+#   cor_train = as.vector(cor_train),
+#   cor_nontrain = as.vector(cor_nontrain)
+# )
+# 
+# df_direction_tissue <- df_concordance %>%
+#   filter(cor_train > 0.6) %>%
+#   group_by(tissue) %>%
+#   summarise(
+#     n_pair = n(),
+#     median_cor_nontrain = median(cor_nontrain),
+#     proportion_positive = mean(cor_nontrain > 0),
+#     .groups = "drop"
+#   )
+# 
+# df_direction_tissue$tissue <- factor(
+#   df_direction_tissue$tissue,
+#   levels = df_direction_tissue$tissue[order(df_direction_tissue$proportion_positive)]
+# )
+# 
+# p <- ggplot(df_direction_tissue, aes(x = tissue, y = proportion_positive, fill = proportion_positive)) +
+#   geom_col(width = 0.9, linewidth = 0.1, color = "black") +
+#   scale_fill_gradient(low = "#fbe4e3", high = "#bd3b39") +
+#   scale_y_continuous(
+#     limits = c(0, 1),
+#     breaks = seq(0, 1, 0.2)
+#   ) +
+#   scale_x_discrete(labels = custom_labels) +
+#   labs(y = "Proportion with preserved direction") +
+#   coord_flip() +
+#   theme_classic() +
+#   theme(
+#     panel.border = element_rect(linewidth = 0.1, fill = FALSE),
+#     axis.ticks.x = element_line(linewidth = 0.1),
+#     axis.ticks.y = element_line(linewidth = 0.1),
+#     axis.line = element_blank(),
+#     axis.title.x = element_text(size = 6),
+#     axis.text.x = element_text(size = 5),
+#     axis.title.y = element_blank(),
+#     axis.text.y = element_text(size = 6),
+#     legend.position = "none"
+#   )
+# 
+# ggsave("99_Fig/sup_fig4/Revise/Barplot_direction_preservation.png",plot = p, width = 3, height = 1.5)
+# ggsave("99_Fig/sup_fig4/Revise/Barplot_direction_preservation.pdf",plot = p, width = 3, height = 1.5)
 

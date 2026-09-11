@@ -9,7 +9,7 @@ names(turbo3_hex) <- as.character(0:2)
 
 df <- read.delim("00_src/annotations_full.txt", sep = "\t", row.names = 1)
 
-file_paths <- list.files(path = "03_python_outs/Community/SLICTile/SLICTile_cluster_res0.05_vessel/", full.names = TRUE)
+file_paths <- list.files(path = "00_src/SLICTile_cluster_res0.05_vessel/", full.names = TRUE)
 
 
 samplenames <- sapply(file_paths, function(x) {
@@ -88,8 +88,8 @@ plot_cluster_ratio <- ggplot(df_summary, aes(x = Donor, y = Ratio, fill = Cluste
     legend.box.margin = margin(0, 0, 0, -3, unit = "mm"),
     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
   )
-ggsave("99_Fig/fig5/Vessel_res0.05_community_ratio.png", plot = plot_cluster_ratio, width = 6.5, height = 1.5)
-ggsave("99_Fig/fig5/Vessel_res0.05_community_ratio.pdf", plot = plot_cluster_ratio, width = 6.5, height = 1.5)
+ggsave("99_Fig/fig4/Vessel_res0.05_community_ratio.png", plot = plot_cluster_ratio, width = 6.5, height = 1.5)
+ggsave("99_Fig/fig4/Vessel_res0.05_community_ratio.pdf", plot = plot_cluster_ratio, width = 6.5, height = 1.5)
 
 
 
@@ -141,8 +141,8 @@ p <- ggplot(df_all, aes(x = community0, y = lining_thickness)) +
     axis.text.y  = element_text(size = 5),
     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
   )
-ggsave("99_Fig/fig5/cor_community0_lining.png", plot = p, width = 2, height = 2)
-ggsave("99_Fig/fig5/cor_community0_lining.pdf", plot = p, width = 2, height = 2)
+ggsave("99_Fig/fig4/cor_community0_lining.png", plot = p, width = 2, height = 2)
+ggsave("99_Fig/fig4/cor_community0_lining.pdf", plot = p, width = 2, height = 2)
 
 
 df_all$micro_vessel_ratio <- df_number_thickness$Micro_vessel_ratio
@@ -183,8 +183,8 @@ p <- ggplot(df_all, aes(x = community0, y = micro_vessel_ratio)) +
     axis.text.y  = element_text(size = 5),
     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
   )
-ggsave("99_Fig/fig5/cor_community0_microvessel.png", plot = p, width = 2, height = 2)
-ggsave("99_Fig/fig5/cor_community0_microvessel.pdf", plot = p, width = 2, height = 2)
+ggsave("99_Fig/fig4/cor_community0_microvessel.png", plot = p, width = 2, height = 2)
+ggsave("99_Fig/fig4/cor_community0_microvessel.pdf", plot = p, width = 2, height = 2)
 
 
 

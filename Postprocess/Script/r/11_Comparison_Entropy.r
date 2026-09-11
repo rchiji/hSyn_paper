@@ -83,33 +83,6 @@ for (comp in all_component) {
 # >> Comparison: High - Mid - Adjusted P-value: 0.02786 - Z-value: -2.08419
 # >> Comparison: Low - Mid  - Adjusted P-value: 0.07757 - Z-value: 1.42164
 # =============================================
-# ** Significant Dunn Post-hoc Test Results for TLS **
-# =============================================
-# >> Comparison: High - Low - Adjusted P-value: 0.00147 - Z-value: 3.29613
-# >> Comparison: High - Mid - Adjusted P-value: 0.02136 - Z-value: 2.02640
-# >> Comparison: Low - Mid  - Adjusted P-value: 0.02590 - Z-value: -2.11375
-# =============================================
-# ** Significant Dunn Post-hoc Test Results for Lining **
-# =============================================
-# >> Comparison: High - Low - Adjusted P-value: 0.00002 - Z-value: 4.32306
-# >> Comparison: High - Mid - Adjusted P-value: 0.00203 - Z-value: 2.99959
-# >> Comparison: Low - Mid  - Adjusted P-value: 0.00548 - Z-value: -2.54387
-# =============================================
-# ** Significant Dunn Post-hoc Test Results for Muscle **
-# =============================================
-# >> Comparison: High - Low - Adjusted P-value: 0.01110 - Z-value: -2.67839
-# >> Comparison: Low - Mid  - Adjusted P-value: 0.00780 - Z-value: 2.56221
-# =============================================
-# ** Significant Dunn Post-hoc Test Results for RBC **
-# =============================================
-# >> Comparison: High - Low - Adjusted P-value: 0.02070 - Z-value: 2.20294
-# >> Comparison: High - Mid - Adjusted P-value: 0.00236 - Z-value: 3.16080
-# =============================================
-# ** Significant Dunn Post-hoc Test Results for Micro_vessel **
-# =============================================
-# >> Comparison: High - Low - Adjusted P-value: 0.03603 - Z-value: 2.25677
-# >> Comparison: Low - Mid  - Adjusted P-value: 0.07150 - Z-value: -1.66789
-# =============================================
   
 
 row_sum <- rowSums(df_OA[, minor_component], na.rm = TRUE)

@@ -1,3 +1,0 @@
-split,"class0: Background (um2)","class1: Immune cells (um2)","class2: plasma (um2)","class3: Fibro(loose) (um2)","class4: Fibro(dense,regular) (um2)","class5: Fibro(dense,irregular) (um2)","class6: lining (um2)","class7: vessel (um2)","class8: vessel(large) (um2)","class9: adipose (um2)","class10: Stroma (um2)","class11: muscle (um2)","class12: RBC (um2)"
-train,379119892.5,4108973.6,620043.9,99545503.1,30893954.0,65599564.8,7342784.5,7043897.9,10280762.1,68798741.0,5684819.4,2740730.4,3640624.3
-val,98608088.9,1017278.3,215672.7,22163239.8,7782413.7,15670750.7,1592786.6,1743109.5,2048388.1,16953438.7,1577776.5,821153.7,1160975.8

@@ -7,7 +7,7 @@ library(cowplot)
 
 options(future.globals.maxSize = 80 * 1024^3)
 
-sc <- readRDS("02_Publicdata/rds/seuratObj_add_label_latest_20251027.rds")
+sc <- readRDS("02_Publicdata/RDS/seuratObj_add_label_latest_20251027.rds")
 sc <- SetIdent(sc, value = "CellType_Class1")
 
 
@@ -50,7 +50,7 @@ cluster_colors_stromal <- c(
   "Adipocyte" = "grey"
 )
 
-p_class3 <- DimPlot(sc_stromal, cols = cluster_colors_stromal, group.by = "CellType_Class3", shuffle = TRUE, raster = TRUE) +
+p_class3 <- DimPlot(sc_stromal, cols = cluster_colors_stromal, group.by = "CellType_Class3", shuffle = TRUE, raster = TRUE, pt.size = 1.5) +
   labs(title = "", x = "UMAP 1", y = "UMAP2") +
   theme_classic() +
   theme(
@@ -346,7 +346,7 @@ cluster_colors_vessel <- c(
   "Pericyte" = "#FFD700"
 )
 
-p_class3 <- DimPlot(sc_vessel, cols = cluster_colors_vessel, group.by = "CellType_Class3", shuffle = TRUE, raster = TRUE) +
+p_class3 <- DimPlot(sc_vessel, cols = cluster_colors_vessel, group.by = "CellType_Class3", shuffle = TRUE, raster = TRUE, pt.size = 2) +
   labs(title = "", x = "UMAP 1", y = "UMAP2") +
   theme_classic() +
   theme(

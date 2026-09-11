@@ -4,7 +4,6 @@ library(ggplot2)
 library(ggbeeswarm)
 
 data <- read.delim("01_formatted/annotations_full_OARSI_Krenn.txt", sep = "\t", header = T, row.names = 1)
-# -> "annotations_full_OARSI_Krenn.txt" is "annotations_full.txt" with manually added scoring results.
 data_OA <- data[data$Diagnosis == "OA",]
 
 # cartilage

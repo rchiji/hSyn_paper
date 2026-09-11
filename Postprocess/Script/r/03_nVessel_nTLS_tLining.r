@@ -8,7 +8,7 @@ df <- read.delim(file = "00_src/annotations_full.txt", sep = "\t", row.names = 1
 
 # Aggregation
 ## Micro vessel
-micro_vessel_paths <- list.files(path = "../HE_semantic_segmentation/measure/count_vessel/", full.names = TRUE)
+micro_vessel_paths <- list.files(path = "00_src/Tissue_number_thickness/count_vessel/", full.names = TRUE)
 micro_vessel_list <- lapply(micro_vessel_paths, read.delim)
 
 samplenames <- sapply(micro_vessel_paths, function(x) {
@@ -26,7 +26,7 @@ micro_vessel_list <- mapply(function(df, name) {
 df_micro_vessel <- do.call(rbind, micro_vessel_list)
 
 ## Large vessel
-large_vessel_paths <- list.files(path = "../HE_semantic_segmentation/measure/count_vessel_large_filtered/", full.names = TRUE)
+large_vessel_paths <- list.files(path = "00_src/Tissue_number_thickness/count_vessel_large_filtered/", full.names = TRUE)
 large_vessel_list <- lapply(large_vessel_paths, read.delim)
 
 samplenames <- sapply(large_vessel_paths, function(x) {
@@ -43,7 +43,7 @@ large_vessel_list <- mapply(function(df, name) {
 df_large_vessel <- do.call(rbind, large_vessel_list)
 
 ## TLS
-tls_paths <- list.files(path = "../HE_semantic_segmentation/measure/count_tls_filtered/", full.names = TRUE)
+tls_paths <- list.files(path = "00_src/Tissue_number_thickness/count_tls_filtered/", full.names = TRUE)
 tls_list <- lapply(tls_paths, read.delim)
 
 samplenames <- sapply(tls_paths, function(x) {
@@ -60,7 +60,7 @@ tls_list <- mapply(function(df, name) {
 df_tls <- do.call(rbind, tls_list)
 
 ## Lining
-lining_paths <- list.files(path = "../HE_semantic_segmentation/measure/thickness_lining/", full.names = TRUE)
+lining_paths <- list.files(path = "00_src/Tissue_number_thickness/thickness_lining/", full.names = TRUE)
 lining_list <- lapply(lining_paths, read.delim)
 
 samplenames <- sapply(large_vessel_paths, function(x) {
@@ -137,7 +137,7 @@ df_tissue <- df_tissue %>%
     TLS_ratio = TLS_number / Area
   )
 df[,37:44] <- df_tissue[,c(1:4,6:8,5)]
-write.table(df, "01_formatted/annotations_full_tissue_count_thickness.txt", sep = "\t", row.names = TRUE, col.names = NA)
+# write.table(df, "01_formatted/annotations_full_tissue_count_thickness.txt", sep = "\t", row.names = TRUE, col.names = NA)
 
 df_OA_nonOA_RA <- df[!df$Diagnosis %in% c("SLE", "SSc"), ]
 df_OA_nonOA_RA <- df_OA_nonOA_RA[df_OA_nonOA_RA$Joint == "Knee",]

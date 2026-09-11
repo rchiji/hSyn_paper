@@ -104,6 +104,6 @@ plot_tissue_ratio <- ggplot(df_summary, aes(x = Donor, y = Ratio, fill = TissueT
     legend.box.margin = margin(0, 0, 0, -3, unit = "mm"),
     plot.margin = margin(0.2, 0.2, 0.2, 0.2, "mm")
   )
-ggsave("99_Fig/fig3/tissue_ratio_diagnosis_ordered.png", plot = plot_tissue_ratio, width = 6.5, height = 1.5)
-ggsave("99_Fig/fig3/tissue_ratio_diagnosis_ordered.pdf", plot = plot_tissue_ratio, width = 6.5, height = 1.5)
+ggsave("99_Fig/fig2/tissue_ratio_diagnosis_ordered.png", plot = plot_tissue_ratio, width = 6.5, height = 1.5)
+ggsave("99_Fig/fig2/tissue_ratio_diagnosis_ordered.pdf", plot = plot_tissue_ratio, width = 6.5, height = 1.5)
 

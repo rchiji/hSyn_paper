@@ -8,9 +8,8 @@ library(DESeq2)
 colors <- colorRampPalette(c("#377EB8", "white", "#E41A1C"))(100)
 
 Cluster_colors <- c("1" = "#D8C6C2", 
-                    "2" = "#F3B2A6",
-                    "3" = "#C73A3A",
-                    "4" = "#7F1212")
+                    "2" = "#DD7670",
+                    "3" = "#7F1212")
 
 df <- read.delim(file = "01_formatted/annotations_full_tissue_conection_cluster.txt", sep = "\t", row.names = 1)
 df_OA <- df[df$Diagnosis == "OA",]
@@ -42,7 +41,7 @@ identical(rownames(anno), colnames(data_norm))
 # [1] TRUE
 
 
-anno$cluster <- factor(anno$cluster, levels = c("1", "2", "4", "3"))
+anno$cluster <- factor(anno$cluster, levels = c("1", "2", "3"))
 anno <- anno[order(anno$cluster), , drop = FALSE]
 data_norm <- data_norm[, rownames(anno), drop = FALSE]
 
@@ -56,7 +55,7 @@ tmp <- data_norm %>%
   select(-id) %>% 
   column_to_rownames(var = "symbol")
 
-pdf("99_Fig/fig4/Heatmap_variable_top200.pdf", width = 7, height = 12)
+pdf("99_Fig/fig3/Heatmap_variable_top200.pdf", width = 7, height = 12)
 pheatmap(tmp, 
          cluster_rows = TRUE,
          cluster_cols = FALSE,
