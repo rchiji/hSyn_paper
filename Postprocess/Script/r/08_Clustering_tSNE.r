@@ -422,7 +422,7 @@ for (comp in minor_component) {
 # =============================================
 
 
-# Plot
+## Plot
 df_OA[,major_component] <- df_OA[,major_component]
 df_OA[,minor_component] <- df_OA[,minor_component]
 
@@ -574,6 +574,98 @@ plot_KOOS_Post12 <- ggplot(df_long_KOOS_Post12, aes(x = cluster, y = Value, colo
 ggsave("99_Fig/sup_fig5/cluster_KOOS_post12.png", plot = plot_KOOS_Post12, width = 3.5, height = 1.25)
 ggsave("99_Fig/sup_fig5/cluster_KOOS_post12.pdf", plot = plot_KOOS_Post12, width = 3.5, height = 1.25)
 
+
+## Adjusted KOOS Symptom
+df_OA <- df_OA %>%
+  mutate(
+    cluster = factor(cluster, levels = c(1, 2, 3)),
+    Sex = factor(Sex)
+  )
+
+run_adjusted_koos <- function(data, outcome, baseline, outcome_label) {
+  dat <- data %>%
+    select(all_of(c(outcome, baseline, "cluster", "Age", "Sex", "BMI"))) %>%
+    filter(complete.cases(.))
+  count_table <- data %>%
+    group_by(cluster) %>%
+    summarise(
+      n_total = n(),
+      n_baseline = sum(!is.na(.data[[baseline]])),
+      n_12month = sum(!is.na(.data[[outcome]])),
+      n_BMI = sum(!is.na(BMI)),
+      n_complete = sum(
+        complete.cases(
+          .data[[outcome]],
+          .data[[baseline]],
+          Age,
+          Sex,
+          BMI
+        )
+      ),
+      .groups = "drop"
+    )
+  model_full <- lm(
+    as.formula(paste(outcome, "~ cluster +", baseline, "+ Age + Sex + BMI")),
+    data = dat
+  )
+  model_reduced <- lm(
+    as.formula(paste(outcome, "~", baseline, "+ Age + Sex + BMI")),
+    data = dat
+  )
+  cluster_test <- anova(model_reduced, model_full)
+  cluster_test_df <- data.frame(
+    Outcome = outcome_label,
+    N = nrow(dat),
+    df = cluster_test$Df[2],
+    F = cluster_test$F[2],
+    P = cluster_test$`Pr(>F)`[2]
+  )
+  coef_table <- broom::tidy(
+    model_full,
+    conf.int = TRUE,
+    conf.level = 0.95
+  )
+  emm <- emmeans(model_full, specs = ~ cluster)
+  emm_table <- as.data.frame(summary(emm, infer = c(TRUE, TRUE)))
+  pairwise_table <- as.data.frame(
+    summary(pairs(emm, adjust = "BH"), infer = c(TRUE, TRUE))
+  )
+  return(
+    list(
+      model = model_full,
+      cluster_test = cluster_test_df,
+      coefficients = coef_table,
+      emmeans = emm_table,
+      pairwise = pairwise_table,
+      sample_counts = count_table
+    )
+  )
+}
+
+res_symptom <- run_adjusted_koos(
+  data = df_OA,
+  outcome = "Post_12Month__KOOS_Symptom",
+  baseline = "Pre__KOOS_Symptom",
+  outcome_label = "KOOS Symptom"
+)
+
+overall_summary <- res_symptom$cluster_test
+
+overall_summary
+#       Outcome  N df         F         P
+# 1 KOOS Symptom 59  2 0.6026531 0.5511354
+
+res_symptom$emmeans
+# cluster   emmean       SE df lower.CL upper.CL t.ratio p.value
+# 1       87.81823 2.134389 52 83.53527 92.10120  41.144 <0.0001
+# 2       89.07567 2.239917 52 84.58095 93.57040  39.767 <0.0001
+# 3       84.32267 3.659210 52 76.97992 91.66541  23.044 <0.0001
+
+res_symptom$pairwise
+# contrast             estimate       SE df  lower.CL  upper.CL t.ratio p.value
+# cluster1 - cluster2 -1.257443 2.957568 52 -8.574162  6.059276  -0.425  0.6725
+# cluster1 - cluster3  3.495565 4.370484 52 -7.316562 14.307692   0.800  0.6412
+# cluster2 - cluster3  4.753008 4.337555 52 -5.977656 15.483672   1.096  0.6412
 
 
 # For response to reviewers

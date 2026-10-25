@@ -423,7 +423,7 @@ plot_tissue <- ggplot(Degree_df_long, aes(x = cluster, y = Value, color = cluste
     axis.title.y = element_text(size = 6),
     axis.text.y = element_text(size = 5),
     legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5, , margin = margin(l = -5)),
+    legend.text = element_text(size = 5, margin = margin(l = -5)),
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
@@ -661,7 +661,7 @@ plot_tissue <- ggplot(df_long, aes(x = cluster, y = Value, color = cluster)) +
     axis.title.y = element_text(size = 6),
     axis.text.y = element_text(size = 5),
     legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5, , margin = margin(l = -5)),
+    legend.text = element_text(size = 5, margin = margin(l = -5)),
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin     = margin(0, 0, 0, 0))
@@ -719,7 +719,7 @@ plot_KOOS_Pre <- ggplot(df_long_KOOS_pre, aes(x = cluster, y = Value, color = cl
     axis.title.y = element_text(size = 6),
     axis.text.y = element_text(size = 5),
     legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5, , margin = margin(l = -5)),
+    legend.text = element_text(size = 5, margin = margin(l = -5)),
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin = margin(0, 0, 0, 0))
@@ -749,7 +749,7 @@ plot_KOOS_Post12 <- ggplot(df_long_KOOS_Post12, aes(x = cluster, y = Value, colo
     axis.title.y = element_text(size = 6),
     axis.text.y = element_text(size = 5),
     legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5, , margin = margin(l = -5)),
+    legend.text = element_text(size = 5, margin = margin(l = -5)),
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin = margin(0, 0, 0, 0))
@@ -787,7 +787,7 @@ plot_krenn_synovitis <- ggplot(df_long_Krenn, aes(x = cluster, y = Value, color 
     strip.background = element_blank(),
     strip.placement = "outside",
     legend.title = element_text(size = 5),
-    legend.text = element_text(size = 5, , margin = margin(l = -5)),
+    legend.text = element_text(size = 5, margin = margin(l = -5)),
     legend.key.height = unit(0.25, "cm"),
     legend.box.margin = margin(0, 0, 0, 0),
     legend.margin = margin(0, 0, 0, 0))
@@ -829,6 +829,95 @@ plot_KL <- ggplot(df_KL, aes(x = cluster, y = n, fill = KL_grade)) +
 ggsave("99_Fig/fig3/cluster_KL.png", plot = plot_KL, width = 1.3, height = 1)
 ggsave("99_Fig/fig3/cluster_KL.pdf", plot = plot_KL, width = 1.3, height = 1)
 
+
+## Adjusted KOOS Symptom
+df_OA <- df_OA %>%
+  mutate(
+    cluster = factor(cluster, levels = c(1, 2, 3)),
+    Sex = factor(Sex)
+  )
+
+run_adjusted_koos <- function(data, outcome, outcome_label) {
+  dat <- data %>%
+    select(all_of(c(outcome, "cluster", "Age", "Sex", "BMI"))) %>%
+    filter(complete.cases(.))
+  count_table <- data %>%
+    group_by(cluster) %>%
+    summarise(
+      n_total = n(),
+      n_baseline = sum(!is.na(.data[[outcome]])),
+      n_BMI = sum(!is.na(BMI)),
+      n_complete = sum(
+        complete.cases(
+          .data[[outcome]],
+          Age,
+          Sex,
+          BMI
+        )
+      ),
+      .groups = "drop"
+    )
+  model_full <- lm(
+    as.formula(paste(outcome, "~ cluster + Age + Sex + BMI")),
+    data = dat
+  )
+  model_reduced <- lm(
+    as.formula(paste(outcome, "~ Age + Sex + BMI")),
+    data = dat
+  )
+  cluster_test <- anova(model_reduced, model_full)
+  cluster_test_df <- data.frame(
+    Outcome = outcome_label,
+    N = nrow(dat),
+    df = cluster_test$Df[2],
+    F = cluster_test$F[2],
+    P = cluster_test$`Pr(>F)`[2]
+  )
+  coef_table <- broom::tidy(
+    model_full,
+    conf.int = TRUE,
+    conf.level = 0.95
+  )
+  emm <- emmeans(model_full, specs = ~ cluster)
+  emm_table <- as.data.frame(summary(emm, infer = c(TRUE, TRUE)))
+  pairwise_table <- as.data.frame(
+    summary(pairs(emm, adjust = "BH"), infer = c(TRUE, TRUE))
+  )
+  return(
+    list(
+      model = model_full,
+      cluster_test = cluster_test_df,
+      coefficients = coef_table,
+      emmeans = emm_table,
+      pairwise = pairwise_table,
+      sample_counts = count_table
+    )
+  )
+}
+
+res_symptom <- run_adjusted_koos(
+  data = df_OA,
+  outcome = "Pre__KOOS_Symptom",
+  outcome_label = "KOOS Symptom"
+)
+
+overall_summary <- res_symptom$cluster_test
+
+overall_summary
+#       Outcome  N df        F         P
+# 1 KOOS Symptom 64  2 2.372574 0.1022322
+
+res_symptom$emmeans
+#  cluster   emmean       SE df lower.CL upper.CL t.ratio p.value
+#  1       54.13549 4.828382 58 44.47043 63.80055  11.212 <0.0001
+#  2       65.05955 4.923346 58 55.20440 74.91469  13.214 <0.0001
+#  3       49.16949 6.166430 58 36.82605 61.51294   7.974 <0.0001
+
+res_symptom$pairwise
+#  contrast              estimate       SE df   lower.CL upper.CL t.ratio p.value
+#  cluster1 - cluster2 -10.924055 6.904472 58 -27.946328  6.09822  -1.582  0.1786
+#  cluster1 - cluster3   4.965996 8.117384 58 -15.046590 24.97858   0.612  0.5431
+#  cluster2 - cluster3  15.890051 7.904562 58  -3.597843 35.37794   2.010  0.1472
 
 
 # # For response to reviewers
