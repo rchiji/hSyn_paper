@@ -646,7 +646,7 @@ plot_tissue <- ggplot(df_long, aes(x = cluster, y = Value, color = cluster)) +
   geom_jitter(width = 0.2, alpha = 0.5, size = 0.1) +
   facet_wrap(~ Tissue, scales = "free", labeller = labeller(Tissue = custom_labels), strip.position = "bottom", ncol = 6) + 
   labs(y = "CLR(Proportion)") +
-  scale_color_manual(values = c("1" = "#D8C6C2", "2" = "#F3B2A6", "3" = "#C73A3A", "4" = "#7F1212")) +
+  scale_color_manual(values = c("1" = "#D8C6C2", "2" = "#DD7670", "3" = "#7F1212")) +
   theme_classic() +
   theme(
     panel.border = element_blank(),
